@@ -2,9 +2,9 @@ const type = require( './types.sjs' );
 const parse = require( './data-parse.sjs' );
 const http = require( 'http' );
 
-function post_reader( request, success, fail ) {
+function post_reader( request, next ) {
 
-	if( request instanceof http.IncomingMessage && type.is_function( success ) && type.is_function( fail ) ){
+	if( request instanceof http.IncomingMessage && type.is_function( next ) ){
 
 		try {
 			let method = request.method.toUpperCase();
@@ -30,7 +30,7 @@ function post_reader( request, success, fail ) {
 							}
 						}
 						catch( err ) {
-							fail( err );
+							next( err );
 						}
 					});
 
@@ -40,31 +40,31 @@ function post_reader( request, success, fail ) {
 							let data = body;
 
 							if( content_type.indexOf( type_json ) !== -1 )
-								return success( JSON.parse( data ) );
+								return next( null, JSON.parse( data ) );
 
 							if( content_type.indexOf( type_url ) !== -1 )
-								return success( parse.url_parse( data ) );
+								return next( null, parse.url_parse( data ) );
 
 							if( content_type.indexOf( type_form ) !== -1 ){
 								let boundary = content_type.match( /boundary=([^\s;]+)/ )[ 1 ];
-								return success( parse.formdata_parse( data, boundary ) );
+								return next( null, parse.formdata_parse( data, boundary ) );
 							}
 						}
 						catch( err ) {
-							fail( err );
+							next( err );
 						}
 					});
 				}
 				else {
-					fail( new Error( `This motor only read ${type_json}, ${type_url} or ${type_form} documents. Sorry!` ) );
+					next( new Error( `This motor only read ${type_json}, ${type_url} or ${type_form} documents. Sorry!` ) );
 				}
 			}
 			else {
-				success( null );
+				next( null );
 			}
 		}
 		catch( err ){
-			fail( err );
+			next( err );
 		}
 	}
 	else {
@@ -111,16 +111,21 @@ class Arguments {
 			this.data_args = parse.formdata_parse( data, boundary );
 	}
 
-	set( request, success, failure ) {
+	set( request, next ) {
 		if( request instanceof http.IncomingMessage ){
 			this.setUrlArguments( request.url );
 			this.setHashArguments( request.url );
 			this.setCookies( request.headers.cookie );
 			let ctx = this;
-			post_reader( request, ( data ) => {
-				ctx.setData( data );
-				success();
-			}, failure );
+			post_reader( request, ( err, data ) => {
+				if( err ) {
+					next( err );
+				}
+				else {
+					ctx.setData( data );
+					next();
+				}
+			});
 		}
 		else
 			failure( new Error( "Bad arguments!" ) );
@@ -184,6 +189,19 @@ class Arguments {
 		}
 	}
 
+	getAllData() {
+		let found = {};
+		if( type.is_list( this.data_args ) ){
+			this.data_args.forEach( ( arg ) => {
+				arg.head.forEach( ( h ) => {
+					if( h.options.name )
+						found[ h.options.name ] = arg.body;
+				} );
+			} );
+		}
+		return found;
+	}
+
 	get( name ) {
 		return this.getUrlArgument( name ) || this.getData( name ) || this.getHashArgument( name ) || this.getCookie( name ) || null;
 	}
@@ -192,8 +210,9 @@ class Arguments {
 		let res = {};
 		for( let a in this.url_args )
 			res[ a ] = this.url_args[ a ];
-		for( let a in this.data_args )
-			res[ a ] = this.data_args[ a ];
+		let t = this.getAllData();
+		for( let a in t )
+			res[ a ] = t[ a ];
 		for( let a in this.hash_args )
 			res[ a ] = this.hash_args[ a ];
 		for( let a in this.cookies_args )

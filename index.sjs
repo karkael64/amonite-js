@@ -8,18 +8,21 @@ const https_options = {
 	cert: fs.readFileSync( './https/cert.pem' )
 };
 
-function log_success( req, res ){
-	let dt = Date.now(),
-		start = req.custom.start,
-		code = req.custom.code;
-	console.log( `code=${code} length=${dt - start}ms request=${JSON.stringify( req.file.substr( 0, 40 ) )}` );
-}
+function log( err, req, res ){
 
-function log_failure( req, res, err ) {
-	let dt = Date.now(),
-		start = req.custom.start;
-	console.log( `failure length=${dt - start}ms request=${JSON.stringify( req.file.substr( 0, 40 ) )}` );
-	res.end( '' + err );
+	if( err ) {
+		let dt = Date.now(),
+			start = req.custom.start;
+		console.log( `${req.method} failure! length=${dt - start}ms request=${JSON.stringify( req.file.substr( 0, 40 ) )}` );
+		console.error( `${req.method} failure! length=${dt - start}ms request=${JSON.stringify( req.file.substr( 0, 40 ) )}` );
+		res.end( '' + err );
+	}
+	else {
+		let dt = Date.now(),
+			start = req.custom.start,
+			code = req.custom.code;
+		console.log( `${req.method} code=${code} length=${dt - start}ms request=${JSON.stringify( req.file.substr( 0, 40 ) )}` );
+	}
 }
 
 const server = https.createServer( https_options, ( req, res ) => {
@@ -27,7 +30,7 @@ const server = https.createServer( https_options, ( req, res ) => {
 	req.custom = { 'start': Date.now() };
 
 	if( req instanceof http.IncomingMessage && res instanceof http.ServerResponse )
-		motor.clone().settings( req, res ).send( log_success, log_failure );
+		motor.clone().settings( req, res ).send( log );
 	else
 		throw new Error( "Bad connection objects!" );
 } );

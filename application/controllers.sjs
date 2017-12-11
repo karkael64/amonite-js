@@ -108,30 +108,30 @@ function readHiddenFile( req, res, success, failure ) {
 
 
 //  controllers
-function controller_simpleFile( req, res, success, failure ) {
+function controller_simpleFile( req, res, next ) {
 	isSimpleFile( req, ( bool )=>{
 		if( bool )
-			success( readSimpleFile );
+			next( null, readSimpleFile );
 		else
-			failure();
+			next( new Error( "No match file." ) );
 	})
 }
 
-function controller_execFile( req, res, success, failure ) {
+function controller_execFile( req, res, next ) {
 	isExecuteFile( req, ( bool )=>{
 		if( bool )
-			success( readExecuteFile );
+			next( null, readExecuteFile );
 		else
-			failure();
+			next( new Error( "No match file." ) );
 	});
 }
 
-function controller_hiddenFile( req, res, success, failure ) {
+function controller_hiddenFile( req, res, next ) {
 	isHiddenFile( req, ( bool )=>{
 		if( bool )
-			success( readHiddenFile );
+			next( null, readHiddenFile );
 		else
-			failure();
+			next( new Error( "No match file." ) );
 	})
 }
 

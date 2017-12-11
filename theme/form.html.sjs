@@ -1,4 +1,5 @@
 module.exports = function( req, res, success, failure ){
+
 	success( `<html>
 <head>
     <meta charset="UTF-8">
