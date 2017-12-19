@@ -6,15 +6,14 @@ class IndexPage extends Page {
 
 	constructor() {
 		super();
-
 		this.addComponent( NavComponent );
 	}
 
-	getPage( req, res, success, failure ) {
+	getPage( req, res, next ) {
 
 		let navBody = this.getComponentBody( NavComponent );
 
-		return success( `<!doctype html>
+		return next( null, `<!doctype html>
 <html>
 <head>
 <meta charset="UTF-8">

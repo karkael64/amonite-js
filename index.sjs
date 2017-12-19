@@ -1,5 +1,7 @@
+const HttpCode = require( './libraries/http-code.class.sjs' );
+HttpCode.DEBUG_MODE = true;
+
 const fs = require( 'fs' );
-const http = require( 'http' );
 const motor = require( './application/motor.sjs' );
 
 const https = require( 'https' );
@@ -11,28 +13,23 @@ const https_options = {
 function log( err, req, res ){
 
 	if( err ) {
+		res.end( '' + err );
 		let dt = Date.now(),
 			start = req.custom.start;
-		console.log( `${req.method} failure! length=${dt - start}ms request=${JSON.stringify( req.file.substr( 0, 40 ) )}` );
-		console.error( `${req.method} failure! length=${dt - start}ms request=${JSON.stringify( req.file.substr( 0, 40 ) )}` );
-		res.end( '' + err );
+		console.log( `${req.method} failure! length=${dt - start}ms request=${JSON.stringify(req.file.substr(0,40))}` );
+		console.error( `${req.method} failure! length=${dt - start}ms request=${JSON.stringify(req.file.substr(0,40))}` );
 	}
 	else {
 		let dt = Date.now(),
 			start = req.custom.start,
 			code = req.custom.code;
-		console.log( `${req.method} code=${code} length=${dt - start}ms request=${JSON.stringify( req.file.substr( 0, 40 ) )}` );
+		console.log( `${req.method} code=${code} length=${dt - start}ms request=${JSON.stringify(req.file.substr(0,40) )}` );
 	}
 }
 
 const server = https.createServer( https_options, ( req, res ) => {
-
 	req.custom = { 'start': Date.now() };
-
-	if( req instanceof http.IncomingMessage && res instanceof http.ServerResponse )
-		motor.clone().settings( req, res ).send( log );
-	else
-		throw new Error( "Bad connection objects!" );
+	motor.clone().settings( req, res ).send( log );
 } );
 
 const hostname = '127.0.0.1';

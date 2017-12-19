@@ -108,44 +108,53 @@ class Motor extends Event {
 
 		let id = setTimeout( ()=>{ next( new Error( 'Controller answer is time out.' ) ); }, 1000 );
 		try{
-			controller( this.req, this.res, ( answer ) => {
+			controller( this.req, this.res, ( err, answer ) => {
 
-				if( type.is_function( answer ) )
-					return answer( this.req, this.res, ( answer )=>{
-						clearTimeout( id );
-						if( type.is_string( answer ) )
-							return next( null, answer );
-						else
-							return next( new Error( "Answer is not a string!" ) );
-					}, ( err )=>{
-						clearTimeout( id );
-						return next( err );
-					} );
+				if( err ) {
+					clearTimeout( id );
+					return next( err );
+				}
+				else {
+					if( type.is_function( answer ) )
+						return answer( this.req, this.res, ( err, answer )=>{
+							if( err ) {
+								clearTimeout( id );
+								return next( err );
+							}
+							else {
+								clearTimeout( id );
+								if( type.is_string( answer ) )
+									return next( null, answer );
+								else
+									return next( new Error( "Answer is not a string!" ) );
+							}
+						});
 
-				if( answer instanceof Content )
-					return answer.getContent( this.req, this.res, ( answer )=>{
-						clearTimeout( id );
-						if( type.is_string( answer ) )
-							return next( null, answer );
-						else
-							return next( new Error( "Answer is not a string!" ) );
-					}, ( err )=>{
-						clearTimeout( id );
-						return next( err );
-					} );
+					if( answer instanceof Content )
+						return answer.getContent( this.req, this.res, ( err, answer )=>{
+							if( err ) {
+								clearTimeout( id );
+								return next( err );
+							}
+							else {
+								clearTimeout( id );
+								if( type.is_string( answer ) )
+									return next( null, answer );
+								else
+									return next( new Error( "Answer is not a string!" ) );
+							}
+						});
 
-				clearTimeout( id );
+					clearTimeout( id );
 
-				if( answer instanceof Buffer )
-					answer = answer.toString();
-				if( type.is_string( answer ) )
-					return next( null, answer );
-				else
-					return next( new Error( "Answer is not a string!" ) );
-			}, (a,b,c,d)=>{
-				clearTimeout( id );
-				return next(a,b,c,d);
-			} );
+					if( answer instanceof Buffer )
+						answer = answer.toString();
+					if( type.is_string( answer ) )
+						return next( null, answer );
+					else
+						return next( new Error( "Answer is not a string!" ) );
+				}
+			});
 		}
 		catch( err ){
 			clearTimeout( id );
@@ -235,10 +244,15 @@ class Motor extends Event {
 
 		let _failure = ( err ) => {
 			if( err instanceof HttpCode ) {
-				self.sendHttpCode( err, next )
+				self.sendHttpCode( err, next );
 			}
 			else {
-				self.sendHttpCode( new HttpCode( 500, "Unexpected error.", err ), next )
+				if( err instanceof Error ) {
+					self.sendHttpCode( new HttpCode( 500, "Unexpected error", err ), next );
+				}
+				else {
+					self.sendHttpCode( new HttpCode( 500, "Not an error format" ), next );
+				}
 			}
 		};
 		let _notFound = () => {
@@ -268,7 +282,6 @@ class Motor extends Event {
 									else {
 										self.sendHttpCode( httpCode, next );
 									}
-
 								});
 							}
 						});

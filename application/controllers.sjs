@@ -70,40 +70,38 @@ function isHiddenFile( req, fn ) {
 
 
 //  execution
-function readSimpleFile( req, res, success, failure ) {
-	if( req instanceof http.IncomingMessage && type.is_function( success ) ){
-		fs.readFile( getFilename( req ), ( err, data ) =>{
-			success( err || data );
-		});
+function readSimpleFile( req, res, next ) {
+	if( req instanceof http.IncomingMessage && type.is_function( next ) ){
+		fs.readFile( getFilename( req ), next );
 	}
 	else
-		failure( new Error( "Bad arguments" ) );
+		next( new Error( "Bad arguments" ) );
 }
 
-function readExecuteFile( req, res, success, failure ) {
-	if( req instanceof http.IncomingMessage && type.is_function( success ) ){
+function readExecuteFile( req, res, next ) {
+	if( req instanceof http.IncomingMessage && type.is_function( next ) ){
 		try {
-			success( require( getExecname( req ) ) );
+			next( null, require( getExecname( req ) ) );
 		}
 		catch( err ) {
-			failure( err );
+			next( err );
 		}
 	}
 	else
-		failure( new Error( "Bad arguments" ) );
+		next( new Error( "Bad arguments" ) );
 }
 
-function readHiddenFile( req, res, success, failure ) {
-	if( req instanceof http.IncomingMessage && type.is_function( success ) ){
+function readHiddenFile( req, res, next ) {
+	if( req instanceof http.IncomingMessage && type.is_function( next ) ){
 		try {
-			success( require( getExecname( req ) + '.sjs' ) );
+			next( null, require( getExecname( req ) + '.sjs' ) );
 		}
 		catch( err ) {
-			failure( err );
+			next( err );
 		}
 	}
 	else
-		failure( new Error( "Bad arguments" ) );
+		next( new Error( "Bad arguments" ) );
 }
 
 
@@ -113,7 +111,7 @@ function controller_simpleFile( req, res, next ) {
 		if( bool )
 			next( null, readSimpleFile );
 		else
-			next( new Error( "No match file." ) );
+			next( new Error( "No match simple file." ) );
 	})
 }
 
@@ -122,7 +120,7 @@ function controller_execFile( req, res, next ) {
 		if( bool )
 			next( null, readExecuteFile );
 		else
-			next( new Error( "No match file." ) );
+			next( new Error( "No match server file." ) );
 	});
 }
 
@@ -131,7 +129,7 @@ function controller_hiddenFile( req, res, next ) {
 		if( bool )
 			next( null, readHiddenFile );
 		else
-			next( new Error( "No match file." ) );
+			next( new Error( "No match hidden server file." ) );
 	})
 }
 
@@ -141,23 +139,17 @@ function getData( req, next ) {
 
 	isSimpleFile( req, ( bool )=>{
 		if( bool ) {
-			readSimpleFile( req, ( data )=>{
-				next( data );
-			});
+			readSimpleFile( req, next );
 		}
 		else {
 			isExecuteFile( req, ( bool )=>{
 				if( bool ) {
-					readExecuteFile( req, ( data )=>{
-						next( data );
-					});
+					readExecuteFile( req, next );
 				}
 				else {
 					isHiddenFile( req, ( bool )=>{
 						if( bool ) {
-							readHiddenFile( req, ( data )=>{
-								next( data );
-							});
+							readHiddenFile( req, next );
 						}
 						else {
 							next( new HttpCode( 404 ) );
