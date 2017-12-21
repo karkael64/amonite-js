@@ -134,34 +134,6 @@ function controller_hiddenFile( req, res, next ) {
 }
 
 
-//  sum
-function getData( req, next ) {
-
-	isSimpleFile( req, ( bool )=>{
-		if( bool ) {
-			readSimpleFile( req, next );
-		}
-		else {
-			isExecuteFile( req, ( bool )=>{
-				if( bool ) {
-					readExecuteFile( req, next );
-				}
-				else {
-					isHiddenFile( req, ( bool )=>{
-						if( bool ) {
-							readHiddenFile( req, next );
-						}
-						else {
-							next( new HttpCode( 404 ) );
-						}
-					});
-				}
-			});
-		}
-	})
-}
-
-
 module.exports = {
 	'simpleFile': controller_simpleFile,
 	'execFile': controller_execFile,

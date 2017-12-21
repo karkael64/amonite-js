@@ -1,0 +1,14 @@
+{
+  "name": "amonite-js",
+  "version": "1.0.0",
+  "description": "A Node.js HTTP motor",
+  "main": "index.sjs",
+  "scripts": {
+    "start": "node index.sjs"
+  },
+  "repository": "https://github.com/karkael64/amonite-js.git",
+  "keywords": [],
+  "author": "Karkael",
+  "license": "",
+  "dependencies": {}
+}

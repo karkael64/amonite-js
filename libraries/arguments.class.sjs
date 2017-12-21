@@ -1,3 +1,14 @@
+/*
+ *  Arguments Object is used to stock each data sent by Client.
+ *  The main functionalities are the form-data parser and his file reader.
+ *
+ *  To set this class, please use it like this :
+ *  let arguments = new Arguments;
+ *  arguments.set( req, ( err )=>{...} )
+ *
+ *  By this way, Argument instance will read and split data sent by client and then call the callback.
+ */
+
 const type = require( './types.sjs' );
 const parse = require( './data-parse.sjs' );
 const http = require( 'http' );

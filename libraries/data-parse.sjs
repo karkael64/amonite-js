@@ -1,5 +1,47 @@
+/*
+ *  These functions are used for string parsing to Javascript/JSON usable objects.
+ *  There is :
+ *  -   a url parser
+ *  -   an hash parser
+ *  -   a cookie parser
+ *  -   a formdata parser
+ *  -   utf-8 decoder/encoder
+ */
+
 const type = require( './types.sjs' );
 
+
+/**
+ *  @function parse is used to parse ${text}, isolate couple by ${separator_symbol} and separate key and value of a couple with ${equiv_symbol}.
+ *  @warn if ${equiv_symbol} is undefined or the couple doesn't match, then the couple is the key and the value is true.
+ *  @param text string
+ *  @param separator_symbol string|Regexp
+ *  @param equiv_symbol undefined|string
+ *  @return {{}}
+ */
+
+function parse( text, separator_symbol, equiv_symbol ) {
+	let result = {},
+		items = text.split( separator_symbol );
+	items.forEach( ( item ) => {
+		let s;
+		if( !type.is_undefined( equiv_symbol ) && ( s = item.indexOf( equiv_symbol ) ) ) {
+			result[ item.substr( 0, s ) ] = item.substr( s + equiv_symbol.length );
+		}
+		else
+			result[ item ] = true;
+	} );
+	return result;
+}
+
+
+/**
+ * @function parse_uri is used to parse and decode each key and value from uri encode.
+ * @param text string
+ * @param separator_symbol string|regexp
+ * @param equiv_symbol string|undefined
+ * @returns {{}}
+ */
 
 function parse_uri( text, separator_symbol, equiv_symbol ) {
 	let result = {},
@@ -18,34 +60,46 @@ function parse_uri( text, separator_symbol, equiv_symbol ) {
 	return result;
 }
 
-function parse( text, separator_symbol, equiv_symbol ) {
-	let result = {},
-		items = text.split( separator_symbol );
-	items.forEach( ( item ) => {
-		let s;
-		if( !type.is_undefined( equiv_symbol ) && ( s = item.indexOf( equiv_symbol ) ) ) {
-			result[ item.substr( 0, s ) ] = item.substr( s + equiv_symbol.length );
-		}
-		else
-			result[ item ] = true;
-	} );
-	return result;
-}
+
+/**
+ * @function url_parse can parse an URL arguments string.
+ * @param url string
+ * @returns {*}|null
+ */
 
 function url_parse( url ) {
 	let filter = url.match( /\?([^#]*)(#|$)/ );
 	return filter ? parse_uri( filter[ 1 ], '&', '=' ) : null;
 }
 
+
+/**
+ * @function hash_parse can parse an Hash arguments string, where '/' is couple separator and ':' key/value separator.
+ * @param url
+ * @returns {*}|null
+ */
+
 function hash_parse( url ) {
 	let filter = url.match( /#.*$/ );
 	return filter ? parse_uri( filter[ 0 ], '/', ':' ) : null;
 }
 
+/**
+ * @function hash_parse can parse an Hash arguments string, where '/' is couple separator and ':' key/value separator.
+ * @param request_cookies string
+ * @returns {*}|null
+ */
+
 function cookies_parse( request_cookies ) {
 	return parse_uri( request_cookies, /;\s*/g, '=' );
 }
 
+
+/**
+ * @function headline_parse is used to parse a fomr data headline or a Request/Response header line.
+ * @param text string
+ * @returns {{field: {}, options: {}}}
+ */
 
 function headline_parse( text ) {
 	let options = text.split( /;/g ),
@@ -76,6 +130,12 @@ function headline_parse( text ) {
 	return res;
 }
 
+/**
+ * @function read_each_line is recursively called to read a text, separated by '\n'.
+ * @param text
+ * @param fn
+ */
+
 function read_each_line( text, fn ) {
 	if( type.is_string( text ) && type.is_function( fn ) ){
 		let t, r, line = '';
@@ -88,6 +148,13 @@ function read_each_line( text, fn ) {
 		}
 	}
 }
+
+/**
+ * @function formdata_parse is used to parse a text formatted as a formdata and returns is equivalent object.
+ * @param text string
+ * @param boundary string
+ * @returns {*}
+ */
 
 function formdata_parse( text, boundary ) {
 	if( type.is_string( text ) && type.is_string( boundary ) ){
@@ -135,9 +202,21 @@ function formdata_parse( text, boundary ) {
 }
 
 
+/**
+ * @function utf8_encode is used to translate a binary text to an utf-8 text.
+ * @param text string
+ * @returns string
+ */
+
 function utf8_encode( text ) {
 	return ( new Buffer( text, 'binary' ) ).toString();
 }
+
+/**
+ * @function utf8_decode is used to translate an utf-8 text to a binary text.
+ * @param text string
+ * @returns string
+ */
 
 function utf8_decode( text ) {
 	return ( new Buffer( text ) ).toString( 'binary' );
@@ -154,3 +233,4 @@ module.exports = {
 	'utf8_encode': utf8_encode,
 	'utf8_decode': utf8_decode
 };
+
