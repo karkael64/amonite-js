@@ -123,7 +123,7 @@ function getFilenameMime( filename ) {
 function bodyEtag( body ) {
 	let hash = crypto.createHash( 'sha1' );
 	hash.update( body );
-	return JSON.stringify( hash.digest( 'hex' ) );
+	return hash.digest( 'hex' );
 }
 
 /**

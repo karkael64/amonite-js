@@ -248,7 +248,7 @@ class Motor extends Event {
 				if( answer.length === 0 )
 					return next( null, new HttpCode( 204 ) );
 
-				let etag = Content.bodyEtag( answer ),
+				let etag = JSON.stringify( Content.bodyEtag( answer ) ),
 					req_etag = this.req.headers[ 'if-none-match' ] || this.req.headers[ 'last-modified' ];
 				if( etag === req_etag )
 					return next( null, new HttpCode( 304 ) );
@@ -285,7 +285,7 @@ class Motor extends Event {
 					'Connexion': 'keep-alive',
 					'Content-length': body_length( body ),
 					'Content-type': Content.getFilenameMime( url ),
-					'ETag': Content.bodyEtag( body ),
+					'ETag': JSON.stringify( Content.bodyEtag( body ) ),
 					'Cache-control': 'public, max-age=120',
 					'Date': ( new Date() ).toGMTString(),
 					'Expires': ( new Date( Date.now() + ( 120 * 1000 ) ) ).toGMTString()
