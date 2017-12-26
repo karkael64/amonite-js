@@ -13,7 +13,7 @@ const type = require( './types.sjs' );
 class Component extends Content {
 
 	/**
-	 * @warn this call can't be instanciated as if, a child class should have getComponent as method.
+	 * @warn this class can't be instanciated as if, a child class should have getComponent as method.
 	 */
 
 	constructor() {

@@ -171,8 +171,8 @@ class Motor extends Event {
 	/**
 	 * @function getAnswer is used to execute a controller. Controller response should be a String, a Buffer or a
 	 * Content object.
-	 * @param controller
-	 * @param next
+	 * @param controller function( Http.IncomingMessage req, Http.ServerResponse res, function next( Error err, string|Buffer|Content answer ) )
+	 * @param next function( Error err, string answer )
 	 */
 
 	getAnswer( controller, next ) {
@@ -230,6 +230,13 @@ class Motor extends Event {
 		}
 	}
 
+	/**
+	 * @function getHttpCode is used to transform controller answer to an HttpCode. This function prevent cache
+	 * controls.
+	 * @param answer string
+	 * @param next function( Error err, HttpCode answer )
+	 */
+
 	getHttpCode( answer, next ) {
 
 		if( answer instanceof HttpCode ){
@@ -241,7 +248,8 @@ class Motor extends Event {
 				if( answer.length === 0 )
 					return next( null, new HttpCode( 204 ) );
 
-				let etag = Content.bodyEtag( answer ), req_etag = this.req.headers[ 'if-none-match' ];
+				let etag = Content.bodyEtag( answer ),
+					req_etag = this.req.headers[ 'if-none-match' ] || this.req.headers[ 'last-modified' ];
 				if( etag === req_etag )
 					return next( null, new HttpCode( 304 ) );
 
@@ -255,6 +263,12 @@ class Motor extends Event {
 			return next( err );
 		}
 	}
+
+	/**
+	 * @function sendHttpCode send client Response with an HttpCode object.
+	 * @param httpCode HttpCode
+	 * @param next function( Error err, Http.IncomingMessage req, Http.ServerResponse res )
+	 */
 
 	sendHttpCode( httpCode, next ) {
 
@@ -299,6 +313,12 @@ class Motor extends Event {
 			return next( new Error( 'First parameter is not an HttpCode instance.' ), this.req, this.res );
 	}
 
+	/**
+	 * @function send is a built-in function which configure, get controller, get its answer, wrap it in an HttpCode and
+	 * send HttpCode as client response.
+	 * @param next function( Error err, Http.IncomingMessage req, Http.ServerResponse res )
+	 */
+
 	send( next ) {
 		let self = this;
 
@@ -315,6 +335,7 @@ class Motor extends Event {
 				}
 			}
 		};
+
 		let _notFound = () => {
 			self.sendHttpCode( new HttpCode( 404 ), next );
 		};

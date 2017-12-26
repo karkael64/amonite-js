@@ -244,7 +244,7 @@ class HttpCode extends Content {
 	}
 
 	/**
-	 * @returns {string}
+	 * @returns string
 	 */
 
 	toString() {
