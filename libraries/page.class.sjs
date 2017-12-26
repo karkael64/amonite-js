@@ -27,7 +27,7 @@ class Page extends Content {
 		return i;
 	}
 
-	getContent( req, res, success, failure ) {
+	getContent( req, res, next ) {
 		let len = this.countComponents(),
 			i = 0,
 			self = this;
@@ -35,17 +35,17 @@ class Page extends Content {
 			for( let c in this.components ){
 				let constructor = this.components[ c ],
 					comp = new constructor();
-				comp.getContent( req, res, ( body )=>{
+				comp.getContent( req, res, ( err, body )=>{
 					constructor.body = body;
 					i++;
 					if( i >= len ) {
-						self.getPage( req, res, success, failure );
+						self.getPage( req, res, next );
 					}
-				}, failure );
+				}, next );
 			}
 		}
 		else {
-			self.getPage( req, res, success, failure );
+			self.getPage( req, res, next );
 		}
 	}
 }

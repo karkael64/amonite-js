@@ -97,18 +97,25 @@ const mimes = {
 	}
 };
 
+/**
+ * @function getFilenameMime split a filename and read at the extension at the end. Search in const ${mime} the
+ * corresponding mime.
+ * @param filename string
+ * @returns {*}
+ */
+
 function getFilenameMime( filename ) {
 	let t;
-	if( type.is_string( filename ) && ( t = filename.match( /\w+$/ ) ) && ( t = t[ 0 ] ) ){
-		for( let catk in mimes ){
-			let cat = mimes[ catk ];
-			if( cat[ t ] ){
-				return cat[ t ];
-			}
-		}
-	}
+	if( type.is_string( filename ) && ( t = filename.match( /\w+$/ ) ) && ( t = t[ 0 ] ) )
+		for( let mime of mimes ) if( mime[ t ] ) return mime[ t ];
 	return "text/plain";
 }
+
+/**
+ * @function bodyEtag hash the body
+ * @param body
+ * @returns {*}
+ */
 
 function bodyEtag( body ) {
 	let hash = crypto.createHash( 'sha1' );
@@ -116,7 +123,17 @@ function bodyEtag( body ) {
 	return hash.digest( 'hex' );
 }
 
+/**
+ * @class Controller is a class which is used to create some content, and which can be send and read by the motor. This
+ * class is here an abstract class, please create a child class with a getContent method
+ */
+
 class Content {
+
+	/**
+	 * @warn This class can't be instanciated as if, a child class should have getContent as a method.
+	 * getContent function( Http.IncomingMessage req, Http.ServerResponse res, function next( err, body ) )
+	 */
 
 	constructor() {
 		if( !type.is_function( this.getContent ) )

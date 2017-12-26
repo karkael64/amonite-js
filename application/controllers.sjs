@@ -1,17 +1,39 @@
+/*
+ *  This file create functions as controllers : check conditions and run controller.
+ *  Controllers are :
+ *  -   Simple File : read a file and send its data ;
+ *  -   Exec File : execute a file and send exported data ;
+ *  -   Hidden File : if the file requested doesn't exist but this file ended by ".sjs" exists, execute and send its
+ *  exported data.
+ */
+
+
 const path = require( 'path' );
 const fs = require( 'fs' );
 const http = require( 'http' );
 const type = require( '../libraries/types.sjs' );
-const HttpCode = require( '../libraries/http-code.class.sjs' );
 
 
 //  constants
+
+/**
+ * @function getFilename returns ${req} filepath with no '..' and no '//', then normalize it
+ * @param req Http.IncomingMessage
+ * @returns string
+ */
+
 function getFilename( req ) {
 
 	let filename = req.file.replace( /\.\./, '' ).replace( /\/\//, '/' );
 	filename = path.normalize( filename );
 	return path.normalize( './theme/' + filename );
 }
+
+/**
+ * @function getExecname return ${req} filepath openable by require() with no '..' and no '//'
+ * @param req Http.IncomingMessage
+ * @returns string
+ */
 
 function getExecname( req ) {
 
@@ -106,6 +128,14 @@ function readHiddenFile( req, res, next ) {
 
 
 //  controllers
+
+/**
+ * @function controller_simpleFile is a "controller" which read and send text of a simple file identified
+ * @param req Http.IncomingMessage
+ * @param res Http.ServerResponse
+ * @param next function
+ */
+
 function controller_simpleFile( req, res, next ) {
 	isSimpleFile( req, ( bool )=>{
 		if( bool )
@@ -115,6 +145,13 @@ function controller_simpleFile( req, res, next ) {
 	})
 }
 
+/**
+ * @function controller_execFile is a "controller" which execute and send object exported by an executable file identified
+ * @param req Http.IncomingMessage
+ * @param res Http.ServerResponse
+ * @param next function
+ */
+
 function controller_execFile( req, res, next ) {
 	isExecuteFile( req, ( bool )=>{
 		if( bool )
@@ -123,6 +160,13 @@ function controller_execFile( req, res, next ) {
 			next( new Error( "No match server file." ) );
 	});
 }
+
+/**
+ * @function controller_execFile is a "controller" which execute and send object exported by an hidden executable file identified
+ * @param req Http.IncomingMessage
+ * @param res Http.ServerResponse
+ * @param next function
+ */
 
 function controller_hiddenFile( req, res, next ) {
 	isHiddenFile( req, ( bool )=>{

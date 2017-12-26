@@ -1,5 +1,11 @@
 const Content = require( './content.class.sjs' );
 
+/**
+ * @function getMime returns the mime of a file requested by client
+ * @param req Http.IncomingMessage
+ * @returns string
+ */
+
 function getMime( req ) {
 	return Content.getFilenameMime( req.file );
 }
@@ -60,6 +66,11 @@ const httpCode = {
 };
 
 
+/**
+ * @class HttpCode is a main function to rule Http requests and send a good object in this motor. For example, a
+ * HttpCode 200 send an "OK" status to client, and his body as body response.
+ */
+
 class HttpCode extends Content {
 
 	constructor( code, message, previous ) {
@@ -72,20 +83,41 @@ class HttpCode extends Content {
 		this.name = "HttpCode";
 	}
 
+	/**
+	 * @function getCode returns the HttpCode code.
+	 * @returns number
+	 */
+
 	getCode() {
 		return this.code;
 	}
 
+	/**
+	 * @function getTitle returns the HttpCode title corresponding this code or a default value. This is send at "HTTP"
+	 * header line for example, next to the code.
+	 * @returns string
+	 */
+
 	getTitle() {
-		return ( httpCode[ this.code ] || httpCode[ "default" ] ).title;
+		return ( httpCode[ this.getCode() ] || httpCode[ "default" ] ).title;
 	}
+
+	/**
+	 * @function getMessage returns the body of the HttpCode. The message is also used for the Response body.
+	 * @returns string
+	 */
 
 	getMessage() {
 		if( HttpCode.DEBUG_MODE )
-			return `${this.name} (${this.code}): ${this.message}`;
+			return `${this.name} (${this.getCode()}): ${this.message}`;
 		else
-			return ( httpCode[ this.code ] || httpCode[ "default" ] ).message;
+			return ( httpCode[ this.getCode() ] || httpCode[ "default" ] ).message;
 	}
+
+	/**
+	 * @function getTrace is used to return each lines of the stack at the construction of HttpCode.
+	 * @returns {Array}
+	 */
 
 	getTrace() {
 		let traces = this.trace.split( /\n/ ),
@@ -98,9 +130,19 @@ class HttpCode extends Content {
 		return res;
 	}
 
+	/**
+	 * @function getPrevious returns an Error or a HttpCode created before this one.
+	 * @returns Error|HttpCode.
+	 */
+
 	getPrevious() {
 		return this.previous;
 	}
+
+	/**
+	 * @function getContentAsText returns this HttpCode in a string formatted as a 'text/plain' mime.
+	 * @returns {string}
+	 */
 
 	getContentAsText() {
 		let start = `${this.getCode()} - ${this.getTitle()}\n${this.getMessage()}\n`;
@@ -108,7 +150,7 @@ class HttpCode extends Content {
 		if( HttpCode.DEBUG_MODE ) {
 			let debug = `${start}${this.getTrace().join('\n')}\n`,
 				self = this;
-			while( self = self.previous ) {
+			while( self.getPrevious && ( self = self.getPrevious() ) ) {
 				if( self instanceof HttpCode ) {
 					debug += `${self.getMessage()}\n`;
 					debug += `${self.getTrace().join('\n')}\n`;
@@ -125,12 +167,17 @@ class HttpCode extends Content {
 		}
 	}
 
+	/**
+	 * @function getContentAsHTML returns this HttpCode in a string formatted as a 'text/html' mime.
+	 * @returns {string}
+	 */
+
 	getContentAsHTML() {
 		if( HttpCode.DEBUG_MODE ) {
 			let start = ( `<h1>${this.getCode()} - ${this.getTitle()}</h1>\n<pre>${this.getMessage()}</pre>\n` ),
 				debug = ( `${start}<pre>${this.getTrace().join('\n')}</pre>` ),
 				self = this;
-			while( self = self.previous ) {
+			while( self = self.getPrevious() ) {
 				if( self instanceof HttpCode ) {
 					debug += ( `<pre>${self.getMessage()}</pre>` );
 					debug += ( `<pre>${self.getTrace().join('\n')}</pre>` );
@@ -147,6 +194,11 @@ class HttpCode extends Content {
 		}
 	}
 
+	/**
+	 * @function getContentAsJSON returns this HttpCode in an object.
+	 * @returns {string}
+	 */
+
 	getContentAsJSON() {
 		let obj = {
 			"code": this.getCode(),
@@ -155,7 +207,7 @@ class HttpCode extends Content {
 		};
 		if( HttpCode.DEBUG_MODE ) {
 			obj.trace = this.getTrace();
-			let self = this, p = self.previous;
+			let self = this, p = self.getPrevious();
 			while( p ) {
 				if( p instanceof HttpCode ) {
 					self.previous = p.getContentAsJSON();
@@ -168,28 +220,40 @@ class HttpCode extends Content {
 					};
 				}
 				self = p;
-				p = self.previous;
+				p = self.getPrevious();
 			}
 		}
 		return obj;
 	}
 
+	/**
+	 * @function getContent returns HttpCode in a string in the format in the file requested.
+	 * @param req Http.IncomingMessage
+	 * @returns string
+	 */
+
 	getContent( req ) {
 		let mime = getMime( req );
 		if( mime === 'text/html' )
 			return this.getContentAsHTML();
-		if( mime === 'text/plain' )
-			return this.getContentAsText();
 		if( mime === 'application/json' )
 			return JSON.stringify( this.getContentAsJSON(), true, 4 );
+		return this.getContentAsText();
 	}
+
+	/**
+	 * @returns {string}
+	 */
 
 	toString() {
 		return "[object HttpCode]";
 	}
 }
 
+/**
+ * HttpCode.DEBUG_MODE is a boolean where true print stack trace and previous errors when the code is not 200.
+ * @type {boolean}
+ */
 HttpCode.DEBUG_MODE = false;
-HttpCode.READ_PREVIOUS = false;
 
 module.exports = HttpCode;

@@ -1,6 +1,11 @@
 const type = require( './types.sjs' );
 
+/**
+ * @class Event allows you to use the event paradigm, synchronous and asynchronous.
+ */
+
 class Event {
+
 	constructor() {
 
 		Object.defineProperty( this, "__events__", {
@@ -11,6 +16,13 @@ class Event {
 		} );
 	}
 
+	/**
+	 * @function on is used to record a function ${fn} to call when ${event} is dispatched.
+	 * @param event string
+	 * @param fn function
+	 * @returns {Event}
+	 */
+
 	on( event, fn ) {
 		if( type.is_function( fn ) ){
 			if( !type.is_list( this.__events__[ event ] ) )
@@ -19,6 +31,14 @@ class Event {
 		}
 		return this;
 	}
+
+	/**
+	 * @function detach is used to revoke a function ${fn} or every functions if undefined, to call $when ${event} is
+	 * dispatched.
+	 * @param event string
+	 * @param fn function|undefined
+	 * @returns {Event}
+	 */
 
 	detach( event, fn ) {
 		if( type.is_list( this.__events__[ event ] ) && type.is_function( fn ) ){
@@ -35,6 +55,14 @@ class Event {
 		return this;
 	}
 
+	/**
+	 * @function dispatch is used to call every functions of ${event} asynchronously after a short timeout, with
+	 * arguments ${arg}.
+	 * @param event string
+	 * @param args list|undefined
+	 * @returns {Event}
+	 */
+
 	dispatch( event, args ) {
 		if( type.is_list( this.__events__[ event ] ) ){
 			for( let fn of this.__events__[ event ] ){
@@ -44,6 +72,13 @@ class Event {
 		return this;
 	}
 
+	/**
+	 * @function dispatch is used to call every functions of ${event} synchronously, with arguments ${arg}.
+	 * @param event string
+	 * @param args list|undefined
+	 * @returns {Event}
+	 */
+
 	dispatchSync( event, args ) {
 		if( type.is_list( this.__events__[ event ] ) ){
 			for( let fn of this.__events__[ event ] ){
@@ -52,6 +87,12 @@ class Event {
 		}
 		return this;
 	}
+
+	/**
+	 * @function count recorded functions of an event ${event} name.
+	 * @param event string
+	 * @returns null|number
+	 */
 
 	count( event ) {
 		return type.is_list( this.__events__[ event ] ) ?

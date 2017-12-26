@@ -13,6 +13,13 @@ const type = require( './types.sjs' );
 const parse = require( './data-parse.sjs' );
 const http = require( 'http' );
 
+/**
+ * @function post_reader reads request body content if request method is POST, PUT, CONNECT or PATCH. The body is parsed
+ * and send in object, with 3 encode-types : url, formdata, json.
+ * @param request Http.IncomingMessage
+ * @param next function( Error|null err, Object data )
+ */
+
 function post_reader( request, next ) {
 
 	if( request instanceof http.IncomingMessage && type.is_function( next ) ){
@@ -67,7 +74,7 @@ function post_reader( request, next ) {
 					});
 				}
 				else {
-					next( new Error( `This motor only read ${type_json}, ${type_url} or ${type_form} documents. Sorry!` ) );
+					next( new Error( `This motor only read "${type_json}", "${type_url}" or "${type_form}" request bodies. Sorry!` ) );
 				}
 			}
 			else {
@@ -84,7 +91,16 @@ function post_reader( request, next ) {
 }
 
 
+/**
+ * @class Arguments is a constructor for parsing request headers and body, and easy seeking them.
+ */
+
 class Arguments {
+
+	/**
+	 * @method constructor initialize each 4 data type : url args, hash args, body, cookies
+	 * @return Arguments
+	 */
 
 	constructor() {
 		this.url_args = {};
@@ -122,6 +138,13 @@ class Arguments {
 			this.data_args = parse.formdata_parse( data, boundary );
 	}
 
+	/**
+	 * @function set is used to set each data types. For the async request body reader, please use a callback for the
+	 * second parameter.
+	 * @param request http.IncomingMessage
+	 * @param next function( err, data )
+	 */
+
 	set( request, next ) {
 		if( request instanceof http.IncomingMessage ){
 			this.setUrlArguments( request.url );
@@ -139,7 +162,7 @@ class Arguments {
 			});
 		}
 		else
-			failure( new Error( "Bad arguments!" ) );
+			next( new Error( "Bad arguments!" ) );
 	}
 
 	//  getter
@@ -158,37 +181,75 @@ class Arguments {
 		return this.cookies_args && ( t = this.cookies_args[ name ] ) && t || null;
 	}
 
+	/**
+	 * @method getDataObject returns formdata decrypted field ${name}.
+	 * This function is often used by .getDataOptions and .getData
+	 * @param name
+	 * @returns {
+	 *      "head":[{
+	 *          "field":{},
+	 *          "options":[{}, …]
+	 *      }, …],
+	 *      "body":""
+	 *  }
+	 */
+
 	getDataObject( name ) {
 		let found = null;
 		if( type.is_string( name ) && type.is_list( this.data_args ) ){
-			this.data_args.forEach( ( arg ) => {
-				arg.head.forEach( ( h ) => {
-					if( h.options.name === name )
-						found = arg;
-				} );
+			this.data_args.forEach( ( arg, field ) => {
+				if( type.is_list( arg.head ) && !type.is_undefined( arg.body ) ) {
+					arg.head.forEach( ( h ) => {
+						if( h.options.name === name )
+							found = arg;
+					} );
+				}
+				else {
+					if( field === name ) {
+						found = {
+							"head":[{
+								"field": field,
+								"options": []
+							}],
+							"body": arg
+						};
+					}
+				}
 			} );
 		}
 		return found;
 	}
 
+	/**
+	 * @method setDataOptions returns an object with raw parameters.
+	 * @param name string
+	 * @returns [{}, …]
+	 */
+
 	getDataOptions( name ) {
 		let res = {}, arg;
 		if( type.is_string( name ) && ( arg = this.getDataObject( name ) ) ){
 			arg.head.forEach( ( head ) => {
-				if( type.is_object( head.field ) ) {
-					for( let key in head.field ) {
+				if( type.is_object( head.field ) ){
+					for( let key in head.field ){
 						res[ key ] = head.field[ key ];
 					}
 				}
-				if( type.is_object( head.options ) ) {
-					for( let key in head.options ) {
+				if( type.is_object( head.options ) ){
+					for( let key in head.options ){
 						res[ key ] = head.options[ key ];
 					}
 				}
-			});
+			} );
 		}
 		return res;
 	}
+
+	/**
+	 * @method getData returns formdata's body from request's body
+	 * @param name string
+	 * @returns string
+	 */
 
 	getData( name ) {
 		let obj = this.getDataObject( name );
@@ -200,22 +261,45 @@ class Arguments {
 		}
 	}
 
+	/**
+	 * @method getAllData returns every request body extracted arguments.
+	 * This function is used by .toJSON for example.
+	 * @returns {{}}
+	 */
+
 	getAllData() {
 		let found = {};
 		if( type.is_list( this.data_args ) ){
-			this.data_args.forEach( ( arg ) => {
-				arg.head.forEach( ( h ) => {
-					if( h.options.name )
-						found[ h.options.name ] = arg.body;
-				} );
+			this.data_args.forEach( ( arg, field ) => {
+				if( type.is_list( arg.head ) && !type.is_undefined( arg.body ) ) {
+					arg.head.forEach( ( h ) => {
+						if( h.options.name )
+							found[ h.options.name ] = arg.body;
+					} );
+				}
+				else {
+					found[ field ] = arg;
+				}
 			} );
 		}
 		return found;
 	}
 
+	/**
+	 * @method get is used to get parameter ${name} value through each 4 argument types, prioritized by Url, Body, Hash and
+	 * then Cookie. Returns null if not found.
+	 * @param name string
+	 * @returns ""|null
+	 */
+
 	get( name ) {
 		return this.getUrlArgument( name ) || this.getData( name ) || this.getHashArgument( name ) || this.getCookie( name ) || null;
 	}
+
+	/**
+	 * @method .toJSON is used to get every arguments of each 4 argument types.
+	 * @returns {{}}
+	 */
 
 	toJSON() {
 		let res = {};

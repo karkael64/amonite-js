@@ -3,12 +3,12 @@ const Component = require( '../../libraries/component.class.sjs' );
 
 class NavComponent extends Component {
 
-	onCall( req, res, success, failure ) {
-		success();
+	onCall( req, res, next ) {
+		next();
 	}
 
-	getComponent( req, res, success, failure ) {
-		return success( `
+	getComponent( req, res, next ) {
+		return next( null, `
 		<nav>
 			<ul>
 				<li>Accueil</li>

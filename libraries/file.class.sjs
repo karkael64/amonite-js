@@ -6,6 +6,13 @@ const Event = require( './event.class.sjs' );
 
 //  private functions
 
+/**
+ * @function add is a private function to record next action on this file.
+ * @param fn function(*)
+ * @param args list
+ * @throws Error if ${fn} is not a function and if ${args} is not a list
+ */
+
 function add( fn, args ) {
 	if( this instanceof File && type.is_function( fn ) && type.is_list( args ) ){
 		this.list.push( { "fn": fn, "args": args } );
@@ -14,6 +21,11 @@ function add( fn, args ) {
 	else
 		throw new Error( "Bad arguments!" );
 }
+
+/**
+ * @function next is a private function to call at the next action on this file. If there is no more function to call,
+ * next dispatch 'end' event.
+ */
 
 function next() {
 	if( this instanceof File ){
@@ -28,11 +40,19 @@ function next() {
 		throw new Error( "Bad arguments!" );
 }
 
+/**
+ * @function wrapNext is a private function which wrap ${fn} for calling at the next function.
+ * @param fn function(*)
+ * @param self File
+ * @returns {function(*)}
+ * @throws Error if ${self} is not File instance of ${fn} is not a function
+ */
+
 function wrapNext( fn, self ) {
 	if( self instanceof File && type.is_function( fn ) )
-		return ( a, b ) => {
+		return ( ...a ) => {
 			self.sema = null;
-			fn( a, b );
+			fn.apply( null, a );
 			next.apply( self );
 		};
 	else
@@ -41,6 +61,12 @@ function wrapNext( fn, self ) {
 
 
 //  async calls
+
+/**
+ * @function exists is used to check if this file exists in this system.
+ * @param next function( Bool exists )
+ * @throws Error if ${next} is not a function
+ */
 
 function exists( next ) {
 	if( this instanceof File && type.is_function( next ) )
@@ -51,12 +77,26 @@ function exists( next ) {
 		throw new Error( "Bad arguments!" );
 }
 
+/**
+ * @function read is used to read entire file.
+ * @param next function( Error err, string body )
+ * @throws Error if ${next} is not a function
+ */
+
 function read( next ) {
 	if( this instanceof File && type.is_function( next ) )
 		fs.readFile( this.path, next );
 	else
 		throw new Error( "Bad arguments!" );
 }
+
+/**
+ * @function readEachChunk
+ * @param path
+ * @param each function( Error err, Number length, Buffer buffer )
+ * @param next function( Error err )
+ * @throws Error if ${path} is not a string, or ${each} or ${next} is not a function
+ */
 
 function readEachChunk( path, each, next ) {
 
@@ -87,7 +127,7 @@ function readEachChunk( path, each, next ) {
 						}
 						else {
 							fs.read( fd, buffer, 0, chunkSize, bytesRead, ( err, bytesRead, buffer ) => {
-								each( err, bytesRead.slice( 0, bytesRead ), buffer, fn );
+								each( err, bytesRead, buffer.slice( 0, bytesRead ), fn );
 							} );
 						}
 						bytesRead += chunkSize;
@@ -100,6 +140,13 @@ function readEachChunk( path, each, next ) {
 	else
 		throw new Error( "Bad arguments!" );
 }
+
+/**
+ * @function readEachLine is used to call function ${each) at each end of line.
+ * @param each function( Error err, string line, function then() )
+ * @param next function( Error err )
+ * @throws Error if ${each} or ${next} is not a function
+ */
 
 function readEachLine( each, next ) {
 	if( this instanceof File && type.is_function( each ) && type.is_function( next ) ){
@@ -139,12 +186,26 @@ function readEachLine( each, next ) {
 		throw new Error( "Bad arguments!" );
 }
 
+/**
+ * @function write is used to write an entire file, create it or replace it.
+ * @param text string
+ * @param next function( Error err )
+ * @throws Error if ${text} is not a string or ${next} is not a function
+ */
+
 function write( text, next ) {
-	if( this instanceof File && type.is_function( next ) )
+	if( this instanceof File && type.is_string( text ) && type.is_function( next ) )
 		fs.writeFile( this.path, text, next );
 	else
 		throw new Error( "Bad arguments!" );
 }
+
+/**
+ * @function writeEachLine is used to write in a file each of these lines pushed in third parameter or ${each}
+ * @param each function( Error err, function push( String line ) )
+ * @param next function( Error err, Number length )
+ * @throws Error if ${each} or ${next} is not a function
+ */
 
 function writeEachLine( each, next ) {
 	if( this instanceof File && type.is_function( each ) && type.is_function( next ) ){
@@ -175,6 +236,15 @@ function writeEachLine( each, next ) {
 	else
 		throw new Error( "Bad arguments!" );
 }
+
+/**
+ * @function replaceEachLine is used to replace each line read in the file.
+ * @warn For performance settings, this function create a temp file (this.path + '_temp'). Beware there is no existing
+ * file with this path.
+ * @param each function( Error err, String line, function push( String line ) )
+ * @param next function( Error err, Number length )
+ * @throws Error if ${each} or ${next} is not a function.
+ */
 
 function replaceEachLine( each, next ) {
 	if( this instanceof File && type.is_function( each ) && type.is_function( next ) ){
@@ -220,6 +290,13 @@ function replaceEachLine( each, next ) {
 		throw new Error( "Bad arguments!" );
 }
 
+/**
+ * @function append is used to write at the end of a file.
+ * @param text string
+ * @param next function( Error err )
+ * @throws Error if ${text} is not a string or ${next} is not a function.
+ */
+
 function append( text, next ) {
 	if( this instanceof File && type.is_string( text ) && type.is_function( next ) ){
 		fs.writeFile( this.path, text, { 'flag': 'a' }, next );
@@ -227,6 +304,13 @@ function append( text, next ) {
 	else
 		throw new Error( "Bad arguments!" );
 }
+
+/**
+ * @function rename move this file to a new path. The new position is sent in ${next} second parameter.
+ * @param newPath string
+ * @param next function( Error err, File file )
+ * @throws Error if ${newPath} is not a string or ${next} is not a function.
+ */
 
 function rename( newPath, next ) {
 	if( this instanceof File && type.is_string( newPath ) && type.is_function( next ) ){
@@ -238,6 +322,12 @@ function rename( newPath, next ) {
 		throw new Error( "Bad arguments!" );
 }
 
+/**
+ * @function unlink delete this file.
+ * @param next function( Error err )
+ * @throws Error if ${next} is not a function.
+ */
+
 function unlink( next ) {
 	if( this instanceof File && type.is_function( next ) )
 		fs.unlink( this.path, next );
@@ -248,6 +338,12 @@ function unlink( next ) {
 
 //  static method
 
+/**
+ * @function build is a static method called to be sure to have only one instance for this file.
+ * @param path
+ * @returns File
+ */
+
 function build( path ) {
 	path = pt.normalize( path );
 	if( File.all[ path ] instanceof File )
@@ -256,7 +352,22 @@ function build( path ) {
 		return new File( path );
 }
 
+/**
+ * @class File is used to write/read a file safely. If an instance is correctly created by File.build static method,
+ * this class protect you from errors and your file will not be corrupted. File public methods are used to record a
+ * next action to do in this file.
+ * ${text} is a string to insert,
+ * ${each} is called each line,
+ * ${next} is called at the end of the file,
+ * ${newPath} is a string to a path.
+ */
+
 class File extends Event {
+
+	/**
+	 * @warn to ensure there is no error, please use File.build to instanciate a File object.
+	 * @param path string
+	 */
 
 	constructor( path ) {
 
@@ -318,6 +429,11 @@ class File extends Event {
 
 File.all = {};
 File.build = build;
+
+/**
+ * File.CHUNK_SIZE is used to set this class chunk size. In my computer, 0x10000 is the power of 2 with best performances.
+ * @type number
+ */
 
 File.CHUNK_SIZE = 0x10000;
 
