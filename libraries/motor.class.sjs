@@ -92,6 +92,11 @@ class Motor extends Event {
 		} );
 	}
 
+	/**
+	 * @function configure send all registered configuration functions.
+	 * @param next function( Error err )
+	 */
+
 	configure( next ) {
 		let len = this.count( 'configure' );
 
@@ -118,6 +123,11 @@ class Motor extends Event {
 			next();
 		}
 	}
+
+	/**
+	 * @function getController try every controllers and the first match is send in the callback.
+	 * @param next function( Error err, function fn( Http.IncomingMessage req, Http.ServerResponse res, function next( Error err, string|Buffer|Content answer ) ) )
+	 */
 
 	getController( next ) {
 		let len = this.count( 'controller' );
@@ -158,6 +168,13 @@ class Motor extends Event {
 		}
 	}
 
+	/**
+	 * @function getAnswer is used to execute a controller. Controller response should be a String, a Buffer or a
+	 * Content object.
+	 * @param controller
+	 * @param next
+	 */
+
 	getAnswer( controller, next ) {
 
 		let id = setTimeout( ()=>{ next( new Error( 'Controller answer is time out.' ) ); }, 1000 );
@@ -177,12 +194,14 @@ class Motor extends Event {
 							}
 							else {
 								clearTimeout( id );
-								if( type.is_string( answer ) )
-									return next( null, answer );
-								else
-									return next( new Error( "Answer is not a string!" ) );
+								if( answer instanceof Buffer ) answer = answer.toString();
+								if( type.is_string( answer ) ) return next( null, answer );
+								else return next( new Error( "Answer is not a string!" ) );
 							}
 						});
+
+					if( answer instanceof HttpCode )
+						return next( null, answer );
 
 					if( answer instanceof Content )
 						return answer.getContent( this.req, this.res, ( err, answer )=>{
@@ -192,21 +211,16 @@ class Motor extends Event {
 							}
 							else {
 								clearTimeout( id );
-								if( type.is_string( answer ) )
-									return next( null, answer );
-								else
-									return next( new Error( "Answer is not a string!" ) );
+								if( answer instanceof Buffer ) answer = answer.toString();
+								if( type.is_string( answer ) ) return next( null, answer );
+								else return next( new Error( "Answer is not a string!" ) );
 							}
 						});
 
 					clearTimeout( id );
-
-					if( answer instanceof Buffer )
-						answer = answer.toString();
-					if( type.is_string( answer ) )
-						return next( null, answer );
-					else
-						return next( new Error( "Answer is not a string!" ) );
+					if( answer instanceof Buffer ) answer = answer.toString();
+					if( type.is_string( answer ) ) return next( null, answer );
+					else return next( new Error( "Answer is not a string!" ) );
 				}
 			});
 		}
@@ -254,33 +268,32 @@ class Motor extends Event {
 				let body = httpCode.message,
 					url = this.req.file;
 				this.res.writeHead( code, title, {
+					'Connexion': 'keep-alive',
 					'Content-length': body_length( body ),
 					'Content-type': Content.getFilenameMime( url ),
-					'Etag': Content.bodyEtag( body )
+					'ETag': Content.bodyEtag( body ),
+					'Cache-control': 'public, max-age=120',
+					'Date': ( new Date() ).toGMTString(),
+					'Expires': ( new Date( Date.now() + ( 120 * 1000 ) ) ).toGMTString()
 				} );
 				this.res.end( body );
 				return next( null, this.req, this.res );
 			}
-			if( code === 307 ){
-				let body = httpCode.getMessage();
-				this.res.writeHead( code, title, { 'Location': body } );
-				this.res.end( body );
-				return next( null, this.req, this.res );
-			}
-			if( code === 308 ){
+			if( code === 307 || code === 308 ){
 				let body = httpCode.getMessage();
 				this.res.writeHead( code, title, { 'Location': body } );
 				this.res.end( body );
 				return next( null, this.req, this.res );
 			}
 
-			let body = httpCode.getContent( this.req );
-			this.res.writeHead( code, title, {
-				'Content-length': body_length( body ),
-				'Content-type': Content.getFilenameMime( this.req.file )
+			return httpCode.getContent( this.req, this.res, ( err, body )=>{
+				this.res.writeHead( code, title, {
+					'Content-length': body_length( body ),
+					'Content-type': Content.getFilenameMime( this.req.file )
+				} );
+				this.res.end( body );
+				return next( null, this.req, this.res );
 			} );
-			this.res.end( body );
-			return next( null, this.req, this.res );
 		}
 		else
 			return next( new Error( 'First parameter is not an HttpCode instance.' ), this.req, this.res );

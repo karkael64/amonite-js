@@ -107,7 +107,10 @@ const mimes = {
 function getFilenameMime( filename ) {
 	let t;
 	if( type.is_string( filename ) && ( t = filename.match( /\w+$/ ) ) && ( t = t[ 0 ] ) )
-		for( let mime of mimes ) if( mime[ t ] ) return mime[ t ];
+		for( let m in mimes ) {
+			let mime = mimes[ m ];
+			if( mime[ t ] ) return mime[ t ];
+		}
 	return "text/plain";
 }
 
@@ -120,7 +123,7 @@ function getFilenameMime( filename ) {
 function bodyEtag( body ) {
 	let hash = crypto.createHash( 'sha1' );
 	hash.update( body );
-	return hash.digest( 'hex' );
+	return JSON.stringify( hash.digest( 'hex' ) );
 }
 
 /**

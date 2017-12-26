@@ -229,16 +229,18 @@ class HttpCode extends Content {
 	/**
 	 * @function getContent returns HttpCode in a string in the format in the file requested.
 	 * @param req Http.IncomingMessage
+	 * @param res Http.ServerResponse
+	 * @param next function( Error err, string body )
 	 * @returns string
 	 */
 
-	getContent( req ) {
+	getContent( req, res, next ) {
 		let mime = getMime( req );
 		if( mime === 'text/html' )
-			return this.getContentAsHTML();
+			return next( null, this.getContentAsHTML() );
 		if( mime === 'application/json' )
-			return JSON.stringify( this.getContentAsJSON(), true, 4 );
-		return this.getContentAsText();
+			return next( null, JSON.stringify( this.getContentAsJSON(), true, 4 ) );
+		return next( null, this.getContentAsText() );
 	}
 
 	/**
