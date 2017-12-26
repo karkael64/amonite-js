@@ -177,7 +177,7 @@ class HttpCode extends Content {
 			let start = ( `<h1>${this.getCode()} - ${this.getTitle()}</h1>\n<pre>${this.getMessage()}</pre>\n` ),
 				debug = ( `${start}<pre>${this.getTrace().join('\n')}</pre>` ),
 				self = this;
-			while( self = self.getPrevious() ) {
+			while( self.getPrevious && ( self = self.getPrevious() ) ) {
 				if( self instanceof HttpCode ) {
 					debug += ( `<pre>${self.getMessage()}</pre>` );
 					debug += ( `<pre>${self.getTrace().join('\n')}</pre>` );

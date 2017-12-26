@@ -4,6 +4,7 @@ const Component = require( '../../libraries/component.class.sjs' );
 class NavComponent extends Component {
 
 	onCall( req, res, next ) {
+		throw new HttpCode( 403 );
 		next();
 	}
 
