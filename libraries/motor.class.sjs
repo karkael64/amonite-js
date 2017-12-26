@@ -4,15 +4,50 @@ const Event = require( './event.class.sjs' );
 const HttpCode = require( './http-code.class.sjs' );
 const Content = require( './content.class.sjs' );
 
+/**
+ * @alias Buffer.byteLength
+ * @param body string|buffer
+ * @returns {Number}
+ */
+
 function body_length( body ) {
 	return Buffer.byteLength( body );
 }
 
+/**
+ * @class Motor is a configurable engine to handle Http requests and return a correct answer to the user. In 3 steps :
+ * 1. create a standard motor, where you register configuration and controller functions,
+ * 2. clone it and set in it the Request and the Response,
+ * 3. then send in it a request, response and a callback at the end.
+ *
+ * The motor handle request and controller responses in 5 steps :
+ * a. read request and configure,
+ * b. get the matching controller,
+ * c. get the controller answer,
+ * d. cast controller answer in an HttpCode object,
+ * e. send HttpCode content to the client.
+ */
+
 class Motor extends Event {
 
-	constructor() {
-		super();
+	/**
+	 * @function clone a new Motor based on the original configure and controller functions.
+	 * @returns {Motor}
+	 */
+
+	clone() {
+		let motor = new Motor();
+		motor.__events__.configure = this.__events__.configure;
+		motor.__events__.controller = this.__events__.controller;
+		return motor;
 	}
+
+	/**
+	 * @function settings register Request and Response objects before usage.
+	 * @param req http.IncomingMessage
+	 * @param res http.ServerResponse
+	 * @returns {Motor}
+	 */
 
 	settings( req, res ) {
 		if( req instanceof http.IncomingMessage && res instanceof http.ServerResponse ){
@@ -25,6 +60,11 @@ class Motor extends Event {
 		return this;
 	}
 
+	/**
+	 * @function registerConfiguration record a function to be called when to configure it.
+	 * @param fn function( Http.IncomingMessage req, Http.ServerResponse res, function next( Error err ) )
+	 */
+
 	registerConfiguration( fn ) {
 		this.on( 'configure', ( req, res, next )=>{
 			try {
@@ -35,6 +75,11 @@ class Motor extends Event {
 			}
 		} );
 	}
+
+	/**
+	 * @function registerController record a function which send a function to execute if it matches with request.
+	 * @param fn function( Http.IncomingMessage req, Http.ServerResponse res, function next( Error err ) )
+	 */
 
 	registerController( fn ) {
 		this.on( 'controller', ( req, res, next )=>{
@@ -48,60 +93,69 @@ class Motor extends Event {
 	}
 
 	configure( next ) {
-		let incr = 0,
-			len = this.count( 'configure' ),
-			has_error = false,
-			id = setTimeout( () => { next( new Error( 'Configuration is time out.' ) ) }, 1000 ),
-			args = [
-				this.req,
-				this.res,
-				( err ) => {
-					incr++;
-					if( err )
-						has_error = err;
-					if( incr >= len ){
-						clearTimeout( id );
-						has_error ? next( has_error ) : next();
-					}
-				}
-			];
+		let len = this.count( 'configure' );
 
-		this.dispatch( 'configure', args );
+		if( len ) {
+			let incr = 0,
+				has_error = false,
+				id = setTimeout( () => { next( new Error( 'Configuration is time out.' ) ) }, 1000 ),
+				args = [
+					this.req,
+					this.res,
+					( err ) => {
+						incr++;
+						if( err )
+							has_error = err;
+						if( incr >= len ){
+							clearTimeout( id );
+							has_error ? next( has_error ) : next();
+						}
+					}
+				];
+			this.dispatch( 'configure', args );
+		}
+		else {
+			next();
+		}
 	}
 
 	getController( next ) {
-		let id = setTimeout( () => { next( new Error( 'Controller selection is time out.' ) ) }, 1000 ),
-			done = false,
-			len = this.count( 'controller' ),
-			incr = 0,
-			args = [
-				this.req,
-				this.res,
-				( err, fn ) => {
-					incr++;
-					if( err ) {
-						if( incr >= len && !done ){
-							clearTimeout( id );
-							done = true;
-							return next( new Error( 'No controller found.' ) );
+		let len = this.count( 'controller' );
+		if( len ) {
+			let id = setTimeout( () => { next( new Error( 'Controller selection is time out.' ) ) }, 1000 ),
+				done = false,
+				incr = 0,
+				args = [
+					this.req,
+					this.res,
+					( err, fn ) => {
+						incr++;
+						if( err ) {
+							if( incr >= len && !done ){
+								clearTimeout( id );
+								done = true;
+								return next( new Error( 'No controller found.' ) );
+							}
+						}
+						else {
+							if( type.is_function( fn ) && !done ){
+								clearTimeout( id );
+								done = true;
+								return next( null, fn );
+							}
+							if( incr >= len && !done ){
+								clearTimeout( id );
+								done = true;
+								return next( new Error( 'No controller found.' ) );
+							}
 						}
 					}
-					else {
-						if( type.is_function( fn ) && !done ){
-							clearTimeout( id );
-							done = true;
-							return next( null, fn );
-						}
-						if( incr >= len && !done ){
-							clearTimeout( id );
-							done = true;
-							return next( new Error( 'No controller found.' ) );
-						}
-					}
-				}
-			];
-
-		this.dispatch( 'controller', args );
+				];
+			this.dispatch( 'controller', args );
+		}
+		else {
+			next( new Error( 'No controller registered.' ) );
+		}
 	}
 
 	getAnswer( controller, next ) {
@@ -230,13 +284,6 @@ class Motor extends Event {
 		}
 		else
 			return next( new Error( 'First parameter is not an HttpCode instance.' ), this.req, this.res );
-	}
-
-	clone() {
-		let motor = new Motor();
-		motor.__events__.configure = this.__events__.configure;
-		motor.__events__.controller = this.__events__.controller;
-		return motor;
 	}
 
 	send( next ) {
