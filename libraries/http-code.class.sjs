@@ -257,5 +257,6 @@ class HttpCode extends Content {
  * @type {boolean}
  */
 HttpCode.DEBUG_MODE = false;
+HttpCode.CODES = httpCode;
 
 module.exports = HttpCode;

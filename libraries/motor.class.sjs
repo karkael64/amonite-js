@@ -246,12 +246,12 @@ class Motor extends Event {
 		try{
 			if( type.is_string( answer ) ){
 				if( answer.length === 0 )
-					return next( null, new HttpCode( 204 ) );
+					return next( null, new HttpCode( 204, "" ) );
 
 				let etag = JSON.stringify( Content.bodyEtag( answer ) ),
 					req_etag = this.req.headers[ 'if-none-match' ] || this.req.headers[ 'last-modified' ];
 				if( etag === req_etag )
-					return next( null, new HttpCode( 304 ) );
+					return next( null, new HttpCode( 304, "" ) );
 
 				return next( null, new HttpCode( 200, answer ) );
 			}
@@ -339,7 +339,7 @@ class Motor extends Event {
 		};
 
 		let _notFound = () => {
-			self.sendHttpCode( new HttpCode( 404 ), next );
+			self.sendHttpCode( new HttpCode( 404, HttpCode.CODES[404].message ), next );
 		};
 
 		self.configure( ( err ) => {
