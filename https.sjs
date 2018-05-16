@@ -15,8 +15,10 @@ function log( err, req, res ){
 
 	if( err ) {
 		res.end( '' + err );
-		let length = Date.now() - res.start;
-		logFile.append( JSON.stringify({'method':req.method,'length':length,'request':req.file,'error':{'code':err.getCode(),'message':err.getMessage(),'file':err.getFile(),'line':err.getLine()}}) + '\n', function(){} );
+		let length = Date.now() - res.start,
+			stack = err.stack.split( /[\s]*\n[\s]*at /g );
+		stack.shift();
+		logFile.append( JSON.stringify({'method':req.method,'length':length,'request':req.file,'error':{'code':err.code,'message':err.message,'stack':err.stack}}) + '\n', function(){} );
 	}
 	else {
 		let length = Date.now() - res.start;
@@ -26,11 +28,11 @@ function log( err, req, res ){
 
 const server = https.createServer( https_options, ( req, res ) => {
 	res.start = Date.now();
-	motor.execute( req, res, log );
-} );
+	return motor.execute( req, res, log );
+});
 
 const hostname = '127.0.0.1';
 const port = 443;
 server.listen( port, hostname, () => {
-	console.log( `Server running at https://${hostname}:${port}/` );
-} );
+	return console.log( `Server running at https://${hostname}:${port}/` );
+});
