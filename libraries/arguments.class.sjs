@@ -14,13 +14,13 @@ const parse = require( './data-parse.sjs' );
 const http = require( 'http' );
 
 /**
- * @function post_reader reads request body content if request method is POST, PUT, CONNECT or PATCH. The body is parsed
+ * @function request_body_reader reads request body content if request method is POST, PUT, CONNECT or PATCH. The body is parsed
  * and send in object, with 3 encode-types : url, formdata, json.
  * @param request Http.IncomingMessage
  * @param next function( Error|null err, Object data )
  */
 
-function post_reader( request, next ) {
+function request_body_reader( request, next ) {
 
 	if( request instanceof http.IncomingMessage && type.is_function( next ) ){
 
@@ -30,11 +30,11 @@ function post_reader( request, next ) {
 			if( [ 'POST', 'PUT', 'CONNECT', 'PATCH' ].indexOf( method ) !== -1 ){
 
 				let content_type = request.headers[ 'content-type' ] || '',
-					type_url = 'application/x-www-form-urlencoded',
-					type_form = 'multipart/form-data',
-					type_json = 'application/json';
+					type_url = ( content_type.indexOf('application/x-www-form-urlencoded') !== -1 ),
+					type_form = ( content_type.indexOf('multipart/form-data') !== -1 ),
+					type_json = ( content_type.indexOf('application/json') !== -1 );
 
-				if( content_type.indexOf( type_url ) || content_type.indexOf( type_form ) || content_type.indexOf( type_json ) ){
+				if( type_url || type_form || type_json ){
 
 					let body = '';
 
@@ -55,17 +55,15 @@ function post_reader( request, next ) {
 					request.on( 'end', () => {
 
 						try {
-							let data = body;
+							if( type_json )
+								return next( null, JSON.parse( body ) );
 
-							if( content_type.indexOf( type_json ) !== -1 )
-								return next( null, JSON.parse( data ) );
+							if( type_url )
+								return next( null, parse.url_parse( body ) );
 
-							if( content_type.indexOf( type_url ) !== -1 )
-								return next( null, parse.url_parse( data ) );
-
-							if( content_type.indexOf( type_form ) !== -1 ){
+							if( type_form ){
 								let boundary = content_type.match( /boundary=([^\s;]+)/ )[ 1 ];
-								return next( null, parse.formdata_parse( data, boundary ) );
+								return next( null, parse.formdata_parse( body, boundary ) );
 							}
 						}
 						catch( err ) {
@@ -74,7 +72,8 @@ function post_reader( request, next ) {
 					});
 				}
 				else {
-					next( new Error( `This motor only read "${type_json}", "${type_url}" or "${type_form}" request bodies. Sorry!` ) );
+					next( new Error( 'This motor only read "application/json" or "application/x-www-form-urlencoded" or '+
+						'"multipart/form-data" request body content types. Sorry!' ) );
 				}
 			}
 			else {
@@ -131,11 +130,11 @@ class Arguments {
 			this.cookies_args = parse.cookies_parse( data );
 	}
 
-	setData( data, boundary ) {
+	setData( data ) {
 		if( type.is_object( data ) )
 			this.data_args = data;
-		if( type.is_string( data ) && type.is_string( boundary ) )
-			this.data_args = parse.formdata_parse( data, boundary );
+		if( type.is_string( data ) )
+			this.data_args = {'body':data};
 	}
 
 	/**
@@ -150,13 +149,13 @@ class Arguments {
 			this.setUrlArguments( request.url );
 			this.setHashArguments( request.url );
 			this.setCookies( request.headers.cookie );
-			let ctx = this;
-			post_reader( request, ( err, data ) => {
+			let self = this;
+			request_body_reader( request, ( err, data ) => {
 				if( err ) {
 					next( err );
 				}
 				else {
-					ctx.setData( data );
+					self.setData( data );
 					next();
 				}
 			});
@@ -221,7 +220,7 @@ class Arguments {
 	}
 
 	/**
-	 * @method setDataOptions returns an object with raw parameters.
+	 * @method getDataOptions returns an object with raw parameters.
 	 * @param name string
 	 * @returns [{}, …]
 	 */

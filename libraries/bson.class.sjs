@@ -31,7 +31,8 @@ class BSON {
 				this.data = id_or_data;
 			else
 				this.data = {};
-			next();
+			if( type.is_function( next ) )
+				next();
 		}
 	}
 
@@ -57,10 +58,11 @@ class BSON {
 					}
 				}
 				then();
-			})
+			}, next );
+			return this;
 		}
 		else
-			throw new Error( "Bad arguments!" );
+			throw new Error( "Bad arguments! Should be a <function> as parameter." );
 	}
 
 	/**
@@ -84,18 +86,15 @@ class BSON {
 				}, next );
 			}
 			else {
-				this.nextId( ( err, id )=>{
-					if( err ) return next( err );
-					self.id = id;
-					s.insert( self, ( err )=>{
-						self.sync_date = Date.now();
-						next( err );
-					});
+				s.insert( self, ( err )=>{
+					self.sync_date = Date.now();
+					next( err );
 				});
 			}
+			return this;
 		}
 		else
-			throw new Error( "Bad arguments!" );
+			throw new Error( "Bad arguments! Should be a <function> as parameter." );
 	}
 
 	/**
@@ -136,9 +135,10 @@ class BSON {
 			this.file.readEachLine( ( err, line, then ) => {
 				each( err, JSON.parse( line ), then );
 			}, next );
+			return this;
 		}
 		else
-			throw new Error( "Bad arguments!" );
+			throw new Error( "Bad arguments! Should be two <function> as parameters." );
 	}
 
 	/**
@@ -158,11 +158,12 @@ class BSON {
 						return push( line );
 
 					return push( JSON.stringify( data ) );
-				})
+				});
 			}, next );
+			return this;
 		}
 		else
-			throw new Error( "Bad arguments!" );
+			throw new Error( "Bad arguments! Should be two <function> as parameters." );
 	}
 
 	/**
@@ -173,11 +174,17 @@ class BSON {
 	 */
 
 	insert( data, next ) {
-		if( !type.is_undefined( data ) && type.is_function( next ) ) {
-			this.file.append( JSON.stringify( data ) + '\n', next );
+		if( type.is_object( data ) && type.is_function( next ) ) {
+			var self = this;
+			this.nextId( ( err, id ) => {
+				if( err ) return next( err );
+				data.id = id;
+				self.file.append( JSON.stringify( data ) + '\n', next );
+			});
+			return this;
 		}
 		else
-			throw new Error( "Bad arguments!" );
+			throw new Error( "Bad arguments! Should be an <object> and a <function> as parameters." );
 	}
 
 	/**
@@ -190,6 +197,7 @@ class BSON {
 		if( type.is_function( next ) ) {
 			let max = 1;
 			this.file.readEachLine( ( err, line, then ) => {
+				if( err ) return next( err );
 				try {
 					let data = JSON.parse( line );
 					if( data.id >= max )
@@ -199,16 +207,16 @@ class BSON {
 				catch( err ) {
 					next( err );
 				}
-			}, ()=>{
-				next( null, max );
+			}, ( err )=>{
+				next( err, max );
 			} );
 		}
 		else
-			throw new Error( "Bad arguments!" );
+			throw new Error( "Bad arguments! Should be a <function> as parameter." );
 	}
 }
 
-BSON.FOLDER = './data/';
+BSON.FOLDER = 'C:/www/motor-js/data/';
 BSON.UPDATE_REMOVE = undefined;
 BSON.UPDATE_IGNORE = null;
 

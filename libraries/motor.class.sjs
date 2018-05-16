@@ -37,8 +37,8 @@ class Motor extends Event {
 
 	clone() {
 		let motor = new Motor();
-		motor.__events__.configure = this.__events__.configure;
-		motor.__events__.controller = this.__events__.controller;
+		motor.__events__.configure = this.__events__.configure.slice();
+		motor.__events__.controller = this.__events__.controller.slice();
 		return motor;
 	}
 
@@ -274,6 +274,8 @@ class Motor extends Event {
 
 		if( httpCode instanceof HttpCode ){
 
+			this.req.custom.httpCode = httpCode;
+
 			let code = httpCode.getCode(),
 				title = httpCode.getTitle();
 			this.req.custom.code = code;
@@ -367,7 +369,7 @@ class Motor extends Event {
 							}
 						});
 					}
-				})
+				});
 			}
 		});
 	}

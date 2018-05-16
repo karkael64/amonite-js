@@ -9,15 +9,17 @@ class NavComponent extends Component {
 	}
 
 	getComponent( req, res, next ) {
+
 		return next( null, `
 		<nav>
 			<ul>
-				<li>Accueil</li>
-				<li>Informations</li>
-				<li>Contacts</li>
+				<li><a href="/">Accueil</a></li>
+				<li><a href="/infos.html">Informations</a></li>
+				<li><a href="/contacts.html">Contacts</a></li>
 			</ul>
 		</nav>
 	` );
+		
 	}
 }
 

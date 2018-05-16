@@ -17,6 +17,7 @@ function add( fn, args ) {
 	if( this instanceof File && type.is_function( fn ) && type.is_list( args ) ){
 		this.list.push( { "fn": fn, "args": args } );
 		next.apply( this );
+		return this.list.length;
 	}
 	else
 		throw new Error( "Bad arguments!" );
@@ -346,7 +347,8 @@ function unlink( next ) {
 
 function build( path ) {
 	path = pt.normalize( path );
-	if( File.all[ path ] instanceof File )
+	let file = File.all[ path ];
+	if( file instanceof File )
 		return file;
 	else
 		return new File( path );
@@ -382,48 +384,39 @@ class File extends Event {
 	}
 
 	exists( next ) { // next( bool )
-		add.call( this, exists, [ wrapNext( next, this ) ] );
-		return this.list.length;
+		return add.call( this, exists, [ wrapNext( next, this ) ] );
 	}
 
 	read( next ) { // next( err, text )
-		add.call( this, read, [ wrapNext( next, this ) ] );
-		return this.list.length;
+		return add.call( this, read, [ wrapNext( next, this ) ] );
 	}
 
 	readEachLine( each, next ) { // each( err, text ) next( err )
-		add.call( this, readEachLine, [ each, wrapNext( next, this ) ] );
-		return this.list.length;
+		return add.call( this, readEachLine, [ each, wrapNext( next, this ) ] );
 	}
 
 	write( text, next ) { // next( err )
-		add.call( this, write, [ text, wrapNext( next, this ) ] );
-		return this.list.length;
+		return add.call( this, write, [ text, wrapNext( next, this ) ] );
 	}
 
 	writeEachLine( each, next ) { // each( err, push ) next( err ) push( text )
-		add.call( this, writeEachLine, [ each, wrapNext( next, this ) ] );
-		return this.list.length;
+		return add.call( this, writeEachLine, [ each, wrapNext( next, this ) ] );
 	}
 
 	replaceEachLine( each, next ) { // each( err, line, push ) next( err ) push( text )
-		add.call( this, replaceEachLine, [ each, wrapNext( next, this ) ] );
-		return this.list.length;
+		return add.call( this, replaceEachLine, [ each, wrapNext( next, this ) ] );
 	}
 
 	append( text, next ) { // next( err )
-		add.call( this, append, [ text, wrapNext( next, this ) ] );
-		return this.list.length;
+		return add.call( this, append, [ text, wrapNext( next, this ) ] );
 	}
 
 	rename( newPath, next ) {
-		add.call( this, rename, [ newPath, wrapNext( next, this ) ] );
-		return this.list.length;
+		return add.call( this, rename, [ newPath, wrapNext( next, this ) ] );
 	}
 
 	unlink( next ) {
-		add.call( this, unlink, [ wrapNext( next, this ) ] );
-		return this.list.length;
+		return add.call( this, unlink, [ wrapNext( next, this ) ] );
 	}
 }
 

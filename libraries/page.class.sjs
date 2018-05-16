@@ -18,6 +18,7 @@ class Page extends Content {
 		if( !type.is_function( this.getPage ) )
 			throw new Error( "This instance of Component has no getPage function!" );
 		this.components = {};
+		this.bodies = {};
 		this.length = 0;
 	}
 
@@ -40,7 +41,7 @@ class Page extends Content {
 	 */
 
 	getComponentBody( constructor ) {
-		return this.components[ constructor.name ].body;
+		return this.bodies[ constructor.name ];
 	}
 
 	/**
@@ -70,12 +71,12 @@ class Page extends Content {
 				let constructor = this.components[ c ],
 					comp = new constructor();
 				comp.getContent( req, res, ( err, body )=>{
-					constructor.body = body;
+					this.bodies[ comp.constructor.name ] = body;
 					i++;
 					if( i >= len ) {
 						self.getPage( req, res, next );
 					}
-				}, next );
+				});
 			}
 		}
 		else {
