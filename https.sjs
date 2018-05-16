@@ -2,6 +2,7 @@ const HttpCode = require( './libraries/http-code.class.sjs' );
 HttpCode.DEBUG_MODE = false;
 
 const fs = require( 'fs' );
+const logFile = require( './libraries/file.class.sjs' ).build( './motor.log' );
 const motor = require( './application/motor.sjs' );
 
 const https = require( 'https' );
@@ -14,22 +15,18 @@ function log( err, req, res ){
 
 	if( err ) {
 		res.end( '' + err );
-		let dt = Date.now(),
-			start = req.custom.start;
-		console.log( `${req.method} failure! length=${dt - start}ms request=${JSON.stringify(req.file.substr(0,40))}` );
-		console.error( `${req.method} failure! length=${dt - start}ms request=${JSON.stringify(req.file.substr(0,40))}` );
+		let length = Date.now() - res.start;
+		logFile.append( JSON.stringify({'method':req.method,'length':length,'request':req.file,'error':{'code':err.getCode(),'message':err.getMessage(),'file':err.getFile(),'line':err.getLine()}}) + '\n', function(){} );
 	}
 	else {
-		let dt = Date.now(),
-			start = req.custom.start,
-			code = req.custom.code;
-		console.log( `${req.method} code=${code} length=${dt - start}ms request=${JSON.stringify(req.file.substr(0,40) )}` );
+		let length = Date.now() - res.start;
+		logFile.append( JSON.stringify({'method':req.method,'length':length,'request':req.file,'code':res.httpCode.getCode()}) + '\n', function(){} );
 	}
 }
 
 const server = https.createServer( https_options, ( req, res ) => {
-	req.custom = { 'start': Date.now() };
-	motor.clone().settings( req, res ).send( log );
+	res.start = Date.now();
+	motor.execute( req, res, log );
 } );
 
 const hostname = '127.0.0.1';

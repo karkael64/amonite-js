@@ -274,11 +274,10 @@ class Motor extends Event {
 
 		if( httpCode instanceof HttpCode ){
 
-			this.req.custom.httpCode = httpCode;
+			this.res.httpCode = httpCode;
 
 			let code = httpCode.getCode(),
 				title = httpCode.getTitle();
-			this.req.custom.code = code;
 
 			if( code === 200 ){
 				let body = httpCode.message,
@@ -372,6 +371,10 @@ class Motor extends Event {
 				});
 			}
 		});
+	}
+
+	execute( req, res, next ) {
+		return this.clone().settings( req, res ).send( next );
 	}
 }
 
