@@ -10,6 +10,7 @@
 const ctrls = require( './controllers.sjs' );
 const Arguments = require( '../libraries/arguments.class.sjs' );
 const Motor = require( '../libraries/motor.class.sjs' );
+const logFile = require( '../libraries/file.class.sjs' ).build( './application/motor.log' );
 
 const motor = new Motor();
 
@@ -18,6 +19,21 @@ motor.registerConfiguration( ( req, res, next ) => {
 	req.arguments = new Arguments();
 	req.arguments.set( req, next );
 } );
+
+motor.log = function log( err, req, res ){
+
+	if( err ) {
+		res.end( '' + err );
+		let length = Date.now() - res.start,
+			stack = err.stack.split( /[\s]*\n[\s]*at /g );
+		stack.shift();
+		logFile.append( JSON.stringify({'method':req.method,'length':length,'request':req.file,'error':{'code':err.code,'message':err.message,'stack':err.stack,'date':Date.now()}}) + '\n', function(){} );
+	}
+	else {
+		let length = Date.now() - res.start;
+		logFile.append( JSON.stringify({'method':req.method,'length':length,'request':req.file,'code':res.httpCode.getCode(),'date':Date.now()}) + '\n', function(){} );
+	}
+}
 
 motor.registerController( ctrls.simpleFile );
 motor.registerController( ctrls.execFile );

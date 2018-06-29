@@ -277,35 +277,44 @@ class Motor extends Event {
 			this.res.httpCode = httpCode;
 
 			let code = httpCode.getCode(),
-				title = httpCode.getTitle();
+				title = httpCode.getTitle(),
+				cookies = httpCode.getCookiesToString();
+
+			if( cookies ) httpCode.setHeader( 'Set-Cookie', cookies );
 
 			if( code === 200 ){
+
 				let body = httpCode.message,
 					url = this.req.file;
-				this.res.writeHead( code, title, {
-					'Connexion': 'keep-alive',
-					'Content-length': body_length( body ),
-					'Content-type': Content.getFilenameMime( url ),
-					'ETag': JSON.stringify( Content.bodyEtag( body ) ),
-					'Cache-control': 'public, max-age=120',
-					'Date': ( new Date() ).toGMTString(),
-					'Expires': ( new Date( Date.now() + ( 120 * 1000 ) ) ).toGMTString()
-				} );
+
+				httpCode.setHeader( 'Connexion', 'keep-alive' );
+				httpCode.setHeader( 'Content-length', body_length( body ) );
+				httpCode.setHeader( 'Content-type', Content.getFilenameMime( url ) );
+				httpCode.setHeader( 'ETag', JSON.stringify( Content.bodyEtag( body ) ) );
+				httpCode.setHeader( 'Cache-control', 'public, max-age=120' );
+				httpCode.setHeader( 'Date', ( new Date() ).toGMTString() );
+				httpCode.setHeader( 'Expires', ( new Date( Date.now() + ( 120 * 1000 ) ) ).toGMTString() );
+
+				this.res.writeHead( code, title, httpCode.headers );
 				this.res.end( body );
 				return next( null, this.req, this.res );
 			}
 			if( code === 307 || code === 308 ){
+
 				let body = httpCode.getMessage();
-				this.res.writeHead( code, title, { 'Location': body } );
+				httpCode.setHeader( 'Location', body );
+
+				this.res.writeHead( code, title, httpCode.headers );
 				this.res.end( body );
 				return next( null, this.req, this.res );
 			}
 
 			return httpCode.getContent( this.req, this.res, ( err, body )=>{
-				this.res.writeHead( code, title, {
-					'Content-length': body_length( body ),
-					'Content-type': Content.getFilenameMime( this.req.file )
-				} );
+
+				httpCode.setHeader( 'Content-length', body_length( body ) );
+				httpCode.setHeader( 'Content-type', Content.getFilenameMime( this.req.file ) );
+
+				this.res.writeHead( code, title, httpCode.headers );
 				this.res.end( body );
 				return next( null, this.req, this.res );
 			} );

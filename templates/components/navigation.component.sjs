@@ -13,13 +13,22 @@ class NavComponent extends Component {
 		return next( null, `
 		<nav>
 			<ul>
+				<li v-for="link in links"><a v-bind:href="link.href">{{link.text}}</a></li>
+			</ul>
+		</nav>
+	`);
+
+/*
+		return next( null, `
+		<nav>
+			<ul>
 				<li><a href="/">Accueil</a></li>
 				<li><a href="/infos.html">Informations</a></li>
 				<li><a href="/contacts.html">Contacts</a></li>
 			</ul>
 		</nav>
 	` );
-		
+*/		
 	}
 }
 

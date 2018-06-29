@@ -79,6 +79,8 @@ class HttpCode extends Content {
 		this.message = message || 'No message suited.';
 		this.trace = ( new Error() ).stack;
 		this.previous = previous || null;
+		this.headers = {};
+		this.cookies = {};
 
 		this.name = "HttpCode";
 	}
@@ -241,6 +243,68 @@ class HttpCode extends Content {
 		if( mime === 'application/json' )
 			return next( null, JSON.stringify( this.getContentAsJSON(), true, 4 ) );
 		return next( null, this.getContentAsText() );
+	}
+
+	/**
+	 * @function setHeader set header sent to the client
+	 * @param field Object|string
+	 * @param value string
+	 * @returns HttpCode
+	 */
+
+	setHeader( field, value ) {
+		if( field instanceof Object ) {
+			for( var f in field )
+				this.setHeader( f, field[f] );
+		}
+		else {
+			this.headers[ field ] = value;
+		}
+		return this;
+	}
+
+	/**
+	 * @function setCookie set cookie sent to the client
+	 * @param field Object|string
+	 * @param value string
+	 * @returns HttpCode
+	 */
+
+	setCookie( field, value ) {
+		if( field instanceof Object ) {
+			for( var f in field )
+				this.setCookie( f, field[f] );
+		}
+		else {
+			this.cookies[ field ] = value;
+		}
+		return this;
+	}
+
+	/**
+	 * @function setCookie set cookie sent to the client
+	 * @param field Object|string
+	 * @param value string
+	 * @returns HttpCode
+	 */
+
+	setCookiesOptions( expires, domain, path, secure ) {
+		if( expires instanceof Date ) this.setCookie( 'expires', expires.toUTCString() );
+		if( domain ) this.setCookie( 'domain', domain );
+		if( path ) this.setCookie( 'path', path );
+		if( secure ) this.setCookie( 'secure', '' );
+	}
+
+	/**
+	 * @function getCookiesToString returns a string to build a header
+	 * @returns string
+	 */
+
+	getCookiesToString() {
+		let sum = [];
+		for( let c in this.cookies )
+			sum.push( c.replace( /[=;\\]/, '\\$0' ) + '=' + this.cookies[c].replace( /[=;\\]/, '\\$0' ) );
+		return sum.join('; ');
 	}
 
 	/**
