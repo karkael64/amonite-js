@@ -287,7 +287,7 @@ class Motor extends Event {
 				let body = httpCode.message,
 					url = this.req.file;
 
-				httpCode.setHeader( 'Connexion', 'keep-alive' );
+				httpCode.setHeader( 'Connection', 'keep-alive' );
 				httpCode.setHeader( 'Content-length', body_length( body ) );
 				httpCode.setHeader( 'Content-type', Content.getFilenameMime( url ) );
 				httpCode.setHeader( 'ETag', JSON.stringify( Content.bodyEtag( body ) ) );
