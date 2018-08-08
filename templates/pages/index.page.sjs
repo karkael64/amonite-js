@@ -1,5 +1,5 @@
 const HttpCode = require( 'http-code' );
-const Page = require( '../../libraries/page.class.sjs' );
+const Page = require( '../../node_modules/page/page.js' );
 const NavComponent = require( '../components/navigation.component.sjs' );
 
 class IndexPage extends Page {
