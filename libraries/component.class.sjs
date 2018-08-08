@@ -1,4 +1,4 @@
-const Content = require( './content.class.sjs' );
+const Content = require( 'content' );
 const type = require( 'types' );
 
 /**

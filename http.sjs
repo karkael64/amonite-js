@@ -1,4 +1,4 @@
-const HttpCode = require( './libraries/http-code.class.sjs' );
+const HttpCode = require( 'http-code' );
 HttpCode.DEBUG_MODE = false;
 
 const fs = require( 'fs' );

@@ -96,7 +96,7 @@ function cookies_parse( request_cookies ) {
 
 
 /**
- * @function headline_parse is used to parse a fomr data headline or a Request/Response header line.
+ * @function headline_parse is used to parse a form data headline or a Request/Response header line.
  * @param text string
  * @returns {{field: {}, options: {}}}
  */

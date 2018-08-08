@@ -1,8 +1,8 @@
 const http = require( 'http' );
 const type = require( 'types' );
 const Event = require( './event.class.sjs' );
-const HttpCode = require( './http-code.class.sjs' );
-const Content = require( './content.class.sjs' );
+const HttpCode = require( 'http-code' );
+const Content = require( 'content' );
 
 /**
  * @alias Buffer.byteLength

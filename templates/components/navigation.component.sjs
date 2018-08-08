@@ -1,4 +1,4 @@
-const HttpCode = require( '../../libraries/http-code.class.sjs' );
+const HttpCode = require( 'http-code' );
 const Component = require( '../../libraries/component.class.sjs' );
 
 class NavComponent extends Component {

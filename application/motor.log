@@ -32,3 +32,4 @@
 {"method":"GET","length":5,"request":"/backbone.js-examples/collections3/images/cat2.jpg","code":200,"date":1533212806364}
 {"method":"GET","length":16,"request":"/index.html","code":404,"date":1533729833419}
 {"method":"GET","length":5,"request":"/favicon.ico","code":404,"date":1533729833450}
+{"method":"GET","length":13,"request":"/index.html","code":404,"date":1533733994897}
