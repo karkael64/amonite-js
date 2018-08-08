@@ -8,9 +8,9 @@
  */
 
 const ctrls = require( './controllers.sjs' );
-const Arguments = require( '../libraries/arguments.class.sjs' );
+const Arguments = require( 'http-arguments' );
 const Motor = require( '../libraries/motor.class.sjs' );
-const logFile = require( '../libraries/file.class.sjs' ).build( './application/motor.log' );
+const logFile = require( '../node_modules/bson/file.js' ).build( './application/motor.log' );
 
 const motor = new Motor();
 

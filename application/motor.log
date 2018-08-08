@@ -33,3 +33,6 @@
 {"method":"GET","length":16,"request":"/index.html","code":404,"date":1533729833419}
 {"method":"GET","length":5,"request":"/favicon.ico","code":404,"date":1533729833450}
 {"method":"GET","length":13,"request":"/index.html","code":404,"date":1533733994897}
+{"method":"GET","length":22,"request":"/index.html","code":404,"date":1533735726646}
+{"method":"GET","length":5,"request":"/index.html","code":404,"date":1533735786258}
+{"method":"GET","length":8,"request":"/index.html","code":500,"date":1533735886911}

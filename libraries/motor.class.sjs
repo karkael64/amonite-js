@@ -211,9 +211,10 @@ class Motor extends Event {
 							}
 							else {
 								clearTimeout( id );
+                                if( answer instanceof HttpCode ) return next( null, answer );
 								if( answer instanceof Buffer ) answer = answer.toString();
 								if( type.is_string( answer ) ) return next( null, answer );
-								else return next( new Error( "Answer is not a string!" ) );
+								else return next( new Error( "Answer is not a string or an HttpCode!" ) );
 							}
 						});
 
@@ -386,6 +387,11 @@ class Motor extends Event {
 		return this.clone().settings( req, res ).send( next );
 	}
 }
+
+Motor.HttpCode = HttpCode;
+Motor.Content = Content;
+Motor.Page = Page;
+Motor.Component = Component;
 
 module.exports = Motor;
 

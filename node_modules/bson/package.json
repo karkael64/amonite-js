@@ -1,0 +1,17 @@
+{
+  "name": "bson",
+  "version": "1.0.0",
+  "description": "A class for reading/writing file in BSON not encrypted with high performance",
+  "main": "bson.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "database",
+    "bson",
+    "high",
+    "performance"
+  ],
+  "author": "Karkael <karkael@gmail.com> (https://github.com/karkael64)",
+  "license": "ISC"
+}
