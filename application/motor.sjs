@@ -10,7 +10,7 @@
 const ctrls = require( './controllers.sjs' );
 const Arguments = require( 'http-arguments' );
 const Motor = require( '../libraries/motor.class.sjs' );
-const logFile = require( '../node_modules/bson/file.js' ).build( './application/motor.log' );
+const logFile = require( '../node_modules/bson/file.js' ).build( './application/log.bson' );
 
 const motor = new Motor();
 

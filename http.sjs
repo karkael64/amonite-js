@@ -1,5 +1,5 @@
 const HttpCode = require( 'http-code' );
-HttpCode.DEBUG_MODE = false;
+HttpCode.DEBUG_MODE = true;
 
 const fs = require( 'fs' );
 const motor = require( './application/motor.sjs' );

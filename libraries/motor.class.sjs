@@ -3,6 +3,8 @@ const type = require( 'types' );
 const Event = require( './event.class.sjs' );
 const HttpCode = require( 'http-code' );
 const Content = require( 'content' );
+const Page = require( 'page' );
+const Component = require( 'component' );
 
 /**
  * @alias Buffer.byteLength
@@ -194,7 +196,8 @@ class Motor extends Event {
 							}
 							else {
 								clearTimeout( id );
-								if( answer instanceof Buffer ) answer = answer.toString();
+                                if( answer instanceof HttpCode ) return next( null, answer );
+                            								if( answer instanceof Buffer ) answer = answer.toString();
 								if( type.is_string( answer ) ) return next( null, answer );
 								else return next( new Error( "Answer is not a string!" ) );
 							}

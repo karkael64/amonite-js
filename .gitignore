@@ -1,5 +1,6 @@
 .git
+.git/*
 .gitignore
 .idea
-theme
+.idea/*
 amonite-js.iml

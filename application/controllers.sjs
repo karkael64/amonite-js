@@ -37,8 +37,8 @@ function getFilename( req ) {
 
 function getExecname( req ) {
 
-	let filename = req.file.replace( /\.\./, '' ).replace( /\/\//, '/' );
-	return '../theme/' + filename;
+	let filename = ( '/' + req.file ).replace( /\.\./, '' ).replace( /\/\//, '/' );
+	return '../theme' + filename;
 }
 
 function isExecuteFilename( req ) {
