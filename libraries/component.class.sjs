@@ -1,5 +1,5 @@
 const Content = require( './content.class.sjs' );
-const type = require( './types.sjs' );
+const type = require( 'types' );
 
 /**
  * @class Component is used to create easy exportable items, often HTML items. For example, onCall is a method called

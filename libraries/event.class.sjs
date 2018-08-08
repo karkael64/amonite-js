@@ -1,4 +1,4 @@
-const type = require( './types.sjs' );
+const type = require( 'types' );
 
 /**
  * @class Event allows you to use the event paradigm, synchronous and asynchronous.

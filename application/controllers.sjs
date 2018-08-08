@@ -11,7 +11,7 @@
 const path = require( 'path' );
 const fs = require( 'fs' );
 const http = require( 'http' );
-const type = require( '../libraries/types.sjs' );
+const type = require( 'types' );
 
 
 //  constants

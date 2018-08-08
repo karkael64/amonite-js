@@ -1,5 +1,6 @@
 const crypto = require( 'crypto' );
-const type = require( "./types.sjs" );
+const type = require( 'types' );
+
 const mimes = {
 	"application": {
 		"js": "application/javascript",

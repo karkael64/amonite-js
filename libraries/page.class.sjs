@@ -1,5 +1,5 @@
 const Content = require( './content.class.sjs' );
-const type = require( './types.sjs' );
+const type = require( 'types' );
 
 /**
  * @class Page is used to create easy Component wrapper, often HTML items. For example, you can add components in your

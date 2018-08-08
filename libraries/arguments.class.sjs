@@ -9,7 +9,7 @@
  *  By this way, Argument instance will read and split data sent by client and then call the callback.
  */
 
-const type = require( './types.sjs' );
+const type = require( 'types' );
 const parse = require( './data-parse.sjs' );
 const http = require( 'http' );
 

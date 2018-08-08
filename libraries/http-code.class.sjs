@@ -198,7 +198,7 @@ class HttpCode extends Content {
 
 	/**
 	 * @function getContentAsJSON returns this HttpCode in an object.
-	 * @returns {string}
+	 * @returns object
 	 */
 
 	getContentAsJSON() {
@@ -241,7 +241,7 @@ class HttpCode extends Content {
 		if( mime === 'text/html' )
 			return next( null, this.getContentAsHTML() );
 		if( mime === 'application/json' )
-			return next( null, JSON.stringify( this.getContentAsJSON(), true, 4 ) );
+			return next( null, JSON.stringify( this.getContentAsJSON(), null, 4 ) );
 		return next( null, this.getContentAsText() );
 	}
 
@@ -254,7 +254,7 @@ class HttpCode extends Content {
 
 	setHeader( field, value ) {
 		if( field instanceof Object ) {
-			for( var f in field )
+			for( let f in field )
 				this.setHeader( f, field[f] );
 		}
 		else {
@@ -272,7 +272,7 @@ class HttpCode extends Content {
 
 	setCookie( field, value ) {
 		if( field instanceof Object ) {
-			for( var f in field )
+			for( let f in field )
 				this.setCookie( f, field[f] );
 		}
 		else {
@@ -282,9 +282,11 @@ class HttpCode extends Content {
 	}
 
 	/**
-	 * @function setCookie set cookie sent to the client
-	 * @param field Object|string
-	 * @param value string
+	 * @function setCookiesOptions set all cookies options
+	 * @param expires Date
+	 * @param domain  string
+	 * @param path    string
+	 * @param secure  *
 	 * @returns HttpCode
 	 */
 

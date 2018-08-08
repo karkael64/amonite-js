@@ -8,7 +8,7 @@
  *  -   utf-8 decoder/encoder
  */
 
-const type = require( './types.sjs' );
+const type = require( 'types' );
 
 
 /**

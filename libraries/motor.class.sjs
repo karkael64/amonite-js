@@ -1,5 +1,5 @@
 const http = require( 'http' );
-const type = require( './types.sjs' );
+const type = require( 'types' );
 const Event = require( './event.class.sjs' );
 const HttpCode = require( './http-code.class.sjs' );
 const Content = require( './content.class.sjs' );

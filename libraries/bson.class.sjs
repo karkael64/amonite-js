@@ -1,4 +1,4 @@
-const type = require( './types.sjs' );
+const type = require( 'types' );
 const File = require( './file.class.sjs' );
 
 /**
