@@ -4,10 +4,10 @@
   "description": "Run a motor to execute HTML files",
   "main": "libraries/motor.js",
   "dependencies": {
-    "bson": "^1.0.0",
-    "http-code": "^1.0.0",
-    "http-arguments": "^1.0.0",
-    "types": "^1.0.0"
+    "karkael64/bson": "^1.0.0",
+    "karkael64/http-code": "^1.0.0",
+    "karkael64/http-arguments": "^1.0.0",
+    "karkael64/types": "^1.0.0"
   },
   "devDependencies": {},
   "scripts": {
