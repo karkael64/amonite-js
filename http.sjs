@@ -1,13 +1,10 @@
 const HttpCode = require( 'http-code' );
 HttpCode.DEBUG_MODE = true;
 
-const fs = require( 'fs' );
 const motor = require( './application/motor.sjs' );
-
 const http = require( 'http' );
 
 const server = http.createServer( ( req, res ) => {
-	res.start = Date.now();
 	return motor.execute( req, res, motor.log );
 });
 

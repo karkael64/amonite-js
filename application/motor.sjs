@@ -15,9 +15,11 @@ const logFile = require( '../node_modules/bson/file.js' ).build( './application/
 const motor = new Motor();
 
 motor.registerConfiguration( ( req, res, next ) => {
+    res.start = Date.now();
 	req.file = req.url.replace( /(\?|#).*$/, '' ).replace( /\/$/, '/index.html' );
-	req.arguments = new Arguments();
-	req.arguments.set( req, next );
+	let a = new Arguments();
+	a.set( req, next );
+    req.arguments = a;
 } );
 
 motor.log = function log( err, req, res ){
@@ -33,7 +35,7 @@ motor.log = function log( err, req, res ){
 		let length = Date.now() - res.start;
 		logFile.append( JSON.stringify({'method':req.method,'length':length,'request':req.file,'code':res.httpCode.getCode(),'date':Date.now()}) + '\n', function(){} );
 	}
-}
+};
 
 motor.registerController( ctrls.simpleFile );
 motor.registerController( ctrls.execFile );

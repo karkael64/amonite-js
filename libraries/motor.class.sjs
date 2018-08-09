@@ -17,7 +17,7 @@ function body_length( body ) {
 }
 
 /**
- * @class Motor is a configurable engine to handle Http requests and return a correct answer to the user. In 3 steps :
+ * @class Amonite is a configurable engine to handle Http requests and return a correct answer to the user. In 3 steps :
  * 1. create a standard motor, where you register configuration and controller functions,
  * 2. clone it and set in it the Request and the Response,
  * 3. then send in it a request, response and a callback at the end.
@@ -30,15 +30,15 @@ function body_length( body ) {
  * e. send HttpCode content to the client.
  */
 
-class Motor extends Event {
+class Amonite extends Event {
 
 	/**
-	 * @function clone a new Motor based on the original configure and controller functions.
-	 * @returns {Motor}
+	 * @function clone a new Amonite based on the original configure and controller functions.
+	 * @returns {Amonite}
 	 */
 
 	clone() {
-		let motor = new Motor();
+		let motor = new Amonite();
 		motor.__events__.configure = this.__events__.configure.slice();
 		motor.__events__.controller = this.__events__.controller.slice();
 		return motor;
@@ -48,7 +48,7 @@ class Motor extends Event {
 	 * @function settings register Request and Response objects before usage.
 	 * @param req http.IncomingMessage
 	 * @param res http.ServerResponse
-	 * @returns {Motor}
+	 * @returns {Amonite}
 	 */
 
 	settings( req, res ) {
@@ -391,10 +391,10 @@ class Motor extends Event {
 	}
 }
 
-Motor.HttpCode = HttpCode;
-Motor.Content = Content;
-Motor.Page = Page;
-Motor.Component = Component;
+Amonite.HttpCode = HttpCode;
+Amonite.Content = Content;
+Amonite.Page = Page;
+Amonite.Component = Component;
 
-module.exports = Motor;
+module.exports = Amonite;
 

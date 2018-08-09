@@ -108,13 +108,13 @@ class Event {
         if( type.is_string( event ) ) {
             let split = event.split( /[, ]+/ );
             if( split >= 2 ) {
-                Event.prototype.detach.call( this, split, fn );
+                Event.prototype.dispatch.call( this, split, fn );
                 return this;
             }
         }
         if( type.is_list( event ) ) {
             for( let ev of event )
-                Event.prototype.detach.call( this, ev, fn );
+                Event.prototype.dispatch.call( this, ev, fn );
             return this;
         }
 
@@ -138,13 +138,13 @@ class Event {
         if( type.is_string( event ) ) {
             let split = event.split( /[, ]+/ );
             if( split >= 2 ) {
-                Event.prototype.detach.call( this, split, fn );
+                Event.prototype.dispatchSync.call( this, split, fn );
                 return this;
             }
         }
         if( type.is_list( event ) ) {
             for( let ev of event )
-                Event.prototype.detach.call( this, ev, fn );
+                Event.prototype.dispatchSync.call( this, ev, fn );
             return this;
         }
 
