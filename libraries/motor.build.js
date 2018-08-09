@@ -7,10 +7,10 @@
  *  Then exports this motor instance.
  */
 
-const ctrls = require( './controllers.sjs' );
 const Arguments = require( 'http-arguments' );
-const Motor = require( '../libraries/motor.class.sjs' );
-const logFile = require( '../node_modules/bson/file.js' ).build( './application/log.bson' );
+const ctrls = require( './controllers' );
+const Motor = require( './motor.js' );
+const fs = require( 'fs' );
 
 const motor = new Motor();
 
@@ -29,11 +29,11 @@ motor.log = function log( err, req, res ){
 		let length = Date.now() - res.start,
 			stack = err.stack.split( /[\s]*\n[\s]*at /g );
 		stack.shift();
-		logFile.append( JSON.stringify({'method':req.method,'length':length,'request':req.file,'error':{'code':err.code,'message':err.message,'stack':err.stack,'date':Date.now()}}) + '\n', function(){} );
+        fs.writeFile( motor.logFile, JSON.stringify({'method':req.method,'length':length,'request':req.file,'error':{'code':err.code,'message':err.message,'stack':err.stack,'date':Date.now()}}) + '\n', { 'flag': 'a' }, function(){} );
 	}
 	else {
 		let length = Date.now() - res.start;
-		logFile.append( JSON.stringify({'method':req.method,'length':length,'request':req.file,'code':res.httpCode.getCode(),'date':Date.now()}) + '\n', function(){} );
+        fs.writeFile( motor.logFile, JSON.stringify({'method':req.method,'length':length,'request':req.file,'code':res.httpCode.getCode(),'date':Date.now()}) + '\n', { 'flag': 'a' }, function(){} );
 	}
 };
 

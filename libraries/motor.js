@@ -1,10 +1,12 @@
 const http = require( 'http' );
 const type = require( 'types' );
-const Event = require( './event.class.sjs' );
 const HttpCode = require( 'http-code' );
-const Content = require( 'content' );
-const Page = require( 'libraries/page' );
-const Component = require( 'libraries/component' );
+const Content = require( './content' );
+const Event = require( './event' );
+const Page = require( './page' );
+const Component = require( './component' );
+const reviveHttp = require( './http' );
+const reviveHttps = require( './https' );
 
 /**
  * @alias Buffer.byteLength
@@ -31,6 +33,11 @@ function body_length( body ) {
  */
 
 class Amonite extends Event {
+
+    constructor(){
+        super();
+        this.logFile = Amonite.logFile;
+    }
 
 	/**
 	 * @function clone a new Amonite based on the original configure and controller functions.
@@ -390,6 +397,11 @@ class Amonite extends Event {
 		return this.clone().settings( req, res ).send( next );
 	}
 }
+
+Amonite.logFile = './log.bson';
+
+Amonite.prototype.reviveHttp = reviveHttp;
+Amonite.prototype.reviveHttps = reviveHttps;
 
 Amonite.HttpCode = HttpCode;
 Amonite.Content = Content;

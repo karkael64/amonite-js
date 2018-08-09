@@ -4,4 +4,4 @@
 .idea
 .idea/*
 amonite-js.iml
-application/log.bson
+log.bson
