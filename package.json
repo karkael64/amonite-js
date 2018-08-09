@@ -1,0 +1,33 @@
+{
+  "name": "amonite-js",
+  "version": "1.0.0",
+  "description": "Run a motor to execute HTML files",
+  "main": "libraries/motor.js",
+  "dependencies": {
+    "bson": "^1.0.0",
+    "http-code": "^1.0.0",
+    "http-arguments": "^1.0.0",
+    "types": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karkael64/amonite-js.git"
+  },
+  "keywords": [
+    "motor",
+    "back",
+    "html",
+    "execute",
+    "easy"
+  ],
+  "author": "Karkael <karkael@gmail.com> (https://github.com/karkael64)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/karkael64/amonite-js/issues"
+  },
+  "homepage": "https://github.com/karkael64/amonite-js#readme"
+}
