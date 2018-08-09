@@ -3,5 +3,7 @@
 .gitignore
 .idea
 .idea/*
+http
+http/*
 amonite-js.iml
 log.bson
