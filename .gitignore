@@ -5,5 +5,7 @@
 .idea/*
 http
 http/*
+theme
+theme/*
 amonite-js.iml
 log.bson
