@@ -1,5 +1,5 @@
 const HttpCode = require( 'http-code' );
-const Component = require( '../../node_modules/component/component.js' );
+const Component = require( '../../libraries/component.js' );
 
 class NavComponent extends Component {
 

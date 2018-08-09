@@ -18,6 +18,7 @@ class Page extends Content {
 		if( !type.is_function( this.getPage ) )
 			throw new Error( "This instance of Component has no getPage function!" );
 		this.components = [];
+        this.lastContent = null;
 	}
 
 	/**
@@ -29,17 +30,6 @@ class Page extends Content {
 	addComponent( obj ) {
 		this.components.push( obj );
 		return this;
-	}
-
-	/**
-	 * @function countComponents returns the count of components.
-	 * @returns {number}
-	 */
-
-	countComponents() {
-		let i = 0;
-		for( let c in this.components ) i++;
-		return i;
 	}
 
 	/**
@@ -60,15 +50,30 @@ class Page extends Content {
 				comp.getContent( req, res, ( err, body )=>{
 					i++;
 					if( i >= len ) {
-						self.getPage( req, res, next );
+						self.getPage( req, res, ( err, body ) => {
+                            self.lastContent = err || body;
+                            next( err, body );
+                        });
 					}
 				});
 			}
 		}
 		else {
-			self.getPage( req, res, next );
+			self.getPage( req, res, ( err, body ) => {
+				self.lastContent = err || body;
+				next( err, body );
+			});
 		}
 	}
+
+    /**
+     * @method getLastContent stock last content generated and return it.
+     * @return string
+     */
+
+    getLastContent() {
+        return this.lastContent;
+    }
 }
 
 module.exports = Page;

@@ -3,8 +3,8 @@ const type = require( 'types' );
 const Event = require( './event.class.sjs' );
 const HttpCode = require( 'http-code' );
 const Content = require( 'content' );
-const Page = require( 'page' );
-const Component = require( 'component' );
+const Page = require( 'libraries/page' );
+const Component = require( 'libraries/component' );
 
 /**
  * @alias Buffer.byteLength

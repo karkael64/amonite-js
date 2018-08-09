@@ -1,4 +1,5 @@
 const HttpCode = require('http-code');
+const Page = require('./libraries/motor.class.sjs').Page;
 
 module.exports = function( req, res, next ){ next( null, new HttpCode( 200, `<!DOCTYPE html>
 <html>
