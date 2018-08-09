@@ -12,4 +12,4 @@ const https_options = {
 
 const Amonite = require( './libraries/motor' );
 let a = new Amonite;
-a.reviveHttp( hostname, port, true );
+a.reviveHttp( hostname, port, false );
