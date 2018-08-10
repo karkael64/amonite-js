@@ -3,8 +3,8 @@
 .gitignore
 .idea
 .idea/*
-http
-http/*
+https
+https/*
 theme
 theme/*
 amonite-js.iml
