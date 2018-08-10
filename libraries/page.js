@@ -44,10 +44,8 @@ class Page extends Content {
 			i = 0,
 			self = this;
 		if( len ) {
-			for( let c in this.components ){
-				let constructor = this.components[ c ],
-					comp = new constructor();
-				comp.getContent( req, res, ( err, body )=>{
+			for( let comp of this.components ){
+				comp.getContent( req, res, ()=>{
 					i++;
 					if( i >= len ) {
 						self.getPage( req, res, ( err, body ) => {
