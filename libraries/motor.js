@@ -399,8 +399,8 @@ class Amonite extends Event {
 	}
 }
 
-Amonite.logFile = path.normalize( __dirname + '/' + '../log.bson' );
-Amonite.publicPath = path.normalize( __dirname + '/' + '../theme' ) + '/';
+Amonite.logFile = path.normalize( __dirname + '/../../log.bson' );
+Amonite.publicPath = path.normalize( __dirname + '/../../theme' ) + '/';
 
 Amonite.prototype.reviveHttp = reviveHttp;
 Amonite.prototype.reviveHttps = reviveHttps;
