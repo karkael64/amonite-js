@@ -7,6 +7,7 @@ const Page = require( './page' );
 const Component = require( './component' );
 const reviveHttp = require( './http' );
 const reviveHttps = require( './https' );
+const path = require( 'path' );
 
 /**
  * @alias Buffer.byteLength
@@ -36,7 +37,6 @@ class Amonite extends Event {
 
     constructor(){
         super();
-        this.logFile = Amonite.logFile;
     }
 
 	/**
@@ -48,7 +48,7 @@ class Amonite extends Event {
 		let motor = new Amonite();
 		motor.__events__.configure = this.__events__.configure.slice();
 		motor.__events__.controller = this.__events__.controller.slice();
-		return motor;
+        return motor;
 	}
 
 	/**
@@ -60,6 +60,7 @@ class Amonite extends Event {
 
 	settings( req, res ) {
 		if( req instanceof http.IncomingMessage && res instanceof http.ServerResponse ){
+		    req.publicPath = Amonite.publicPath;
 			this.req = req;
 			this.res = res;
 		}
@@ -398,7 +399,8 @@ class Amonite extends Event {
 	}
 }
 
-Amonite.logFile = './log.bson';
+Amonite.logFile = path.normalize( __dirname + '/' + '../log.bson' );
+Amonite.publicPath = path.normalize( __dirname + '/' + '../theme' ) + '/';
 
 Amonite.prototype.reviveHttp = reviveHttp;
 Amonite.prototype.reviveHttps = reviveHttps;
