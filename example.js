@@ -9,6 +9,12 @@ const https_options = {
 };
 */
 
+/*
+const path = require('path')
+Amonite.logFile = path.normalize( __dirname + '/log.bson' );
+Amonite.publicPath = path.normalize( __dirname + '/theme' ) + '/';
+*/
+
 const Amonite = require( './libraries/motor' );
 let a = new Amonite;
 a.reviveHttp( hostname, port, true );

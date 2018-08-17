@@ -1,4 +1,5 @@
 const Content = require( './content' );
+const Error = require( './amonite-error' );
 const type = require( 'types' );
 
 

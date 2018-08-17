@@ -2,12 +2,13 @@ const http = require( 'http' );
 const type = require( 'types' );
 const HttpCode = require( 'http-code' );
 const Content = require( './content' );
-const Event = require( './event' );
+const EventTarget = require( './event-target' );
 const Page = require( './page' );
 const Component = require( './component' );
 const reviveHttp = require( './http' );
 const reviveHttps = require( './https' );
 const path = require( 'path' );
+const Error = require( './amonite-error' );
 
 /**
  * @alias Buffer.byteLength
@@ -33,7 +34,7 @@ function body_length( body ) {
  * e. send HttpCode content to the client.
  */
 
-class Amonite extends Event {
+class Amonite extends EventTarget {
 
     constructor(){
         super();
@@ -76,7 +77,7 @@ class Amonite extends Event {
 	 */
 
 	registerConfiguration( fn ) {
-		this.on( 'configure', ( req, res, next )=>{
+		this.on( 'configure', ( ev, req, res, next )=>{
 			try {
 				fn( req, res, next );
 			}
@@ -92,7 +93,7 @@ class Amonite extends Event {
 	 */
 
 	registerController( fn ) {
-		this.on( 'controller', ( req, res, next )=>{
+		this.on( 'controller', ( ev, req, res, next )=>{
 			try {
 				fn( req, res, next );
 			}
@@ -154,7 +155,7 @@ class Amonite extends Event {
 							if( incr >= len && !done ){
 								clearTimeout( id );
 								done = true;
-								return next( new Error( 'No controller found.' ) );
+								return next( new Error( 'No controller found.', -1, err ) );
 							}
 						}
 						else {
@@ -358,8 +359,8 @@ class Amonite extends Event {
 			}
 		};
 
-		let _notFound = () => {
-			self.sendHttpCode( new HttpCode( 404, HttpCode.CODES[404].message ), next );
+		let _notFound = ( err ) => {
+			self.sendHttpCode( new HttpCode( 404, HttpCode.CODES[404].message, err ), next );
 		};
 
 		self.configure( ( err ) => {

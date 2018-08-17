@@ -1,5 +1,6 @@
 const crypto = require( 'crypto' );
 const type = require( 'types' );
+const Error = require( './amonite-error' );
 
 const mimes = {
 	"application": {

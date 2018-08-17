@@ -1,0 +1,109 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/node', '/usr/bin/npm', 'publish' ]
+2 info using npm@3.8.6
+3 info using node@v6.14.2
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: '/home/vcourtin/wks/src/amonite-js',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory /home/vcourtin/.npm/amonite-js/1.0.0/package.tgz not in flight; packing
+9 verbose correctMkdir /home/vcourtin/.npm correctMkdir not in flight; initializing
+10 info lifecycle amonite-js@1.0.0~prepublish: amonite-js@1.0.0
+11 silly lifecycle amonite-js@1.0.0~prepublish: no script for prepublish, continuing
+12 verbose tar pack [ '/home/vcourtin/.npm/amonite-js/1.0.0/package.tgz',
+12 verbose tar pack   '/home/vcourtin/wks/src/amonite-js' ]
+13 verbose tarball /home/vcourtin/.npm/amonite-js/1.0.0/package.tgz
+14 verbose folder /home/vcourtin/wks/src/amonite-js
+15 verbose addLocalTarball adding from inside cache /home/vcourtin/.npm/amonite-js/1.0.0/package.tgz
+16 verbose correctMkdir /home/vcourtin/.npm correctMkdir not in flight; initializing
+17 silly cache afterAdd amonite-js@1.0.0
+18 verbose afterAdd /home/vcourtin/.npm/amonite-js/1.0.0/package/package.json not in flight; writing
+19 verbose correctMkdir /home/vcourtin/.npm correctMkdir not in flight; initializing
+20 verbose afterAdd /home/vcourtin/.npm/amonite-js/1.0.0/package/package.json written
+21 silly publish { name: 'amonite-js',
+21 silly publish   version: '1.0.0',
+21 silly publish   description: 'Run a motor to execute HTML files',
+21 silly publish   main: 'libraries/motor.js',
+21 silly publish   dependencies:
+21 silly publish    { bson: 'github:karkael64/bson',
+21 silly publish      'http-arguments': 'github:karkael64/http-arguments',
+21 silly publish      'http-code': 'github:karkael64/http-code',
+21 silly publish      types: 'github:karkael64/types' },
+21 silly publish   scripts: { test: 'echo "Error: no test specified" && exit 1' },
+21 silly publish   repository:
+21 silly publish    { type: 'git',
+21 silly publish      url: 'git+https://github.com/karkael64/amonite-js.git' },
+21 silly publish   keywords: [ 'motor', 'back', 'html', 'execute', 'easy' ],
+21 silly publish   author:
+21 silly publish    { name: 'Karkael',
+21 silly publish      email: 'karkael@gmail.com',
+21 silly publish      url: 'https://github.com/karkael64' },
+21 silly publish   license: 'ISC',
+21 silly publish   bugs: { url: 'https://github.com/karkael64/amonite-js/issues' },
+21 silly publish   homepage: 'https://github.com/karkael64/amonite-js#readme',
+21 silly publish   readme: '# amonite-js\nNew motor with node.js\n',
+21 silly publish   readmeFilename: 'README.md',
+21 silly publish   gitHead: '6bf2329b10d98a82b0095cabf97897bd21c45b12',
+21 silly publish   _id: 'amonite-js@1.0.0',
+21 silly publish   _shasum: 'e31afd9b0d743ddf8c74207c3a8f1710256da266',
+21 silly publish   _from: '.' }
+22 verbose getPublishConfig undefined
+23 silly mapToRegistry name amonite-js
+24 silly mapToRegistry using default registry
+25 silly mapToRegistry registry https://registry.npmjs.org/
+26 silly mapToRegistry data Result {
+26 silly mapToRegistry   raw: 'amonite-js',
+26 silly mapToRegistry   scope: null,
+26 silly mapToRegistry   name: 'amonite-js',
+26 silly mapToRegistry   rawSpec: '',
+26 silly mapToRegistry   spec: 'latest',
+26 silly mapToRegistry   type: 'tag' }
+27 silly mapToRegistry uri https://registry.npmjs.org/amonite-js
+28 verbose publish registryBase https://registry.npmjs.org/
+29 silly publish uploading /home/vcourtin/.npm/amonite-js/1.0.0/package.tgz
+30 verbose request uri https://registry.npmjs.org/amonite-js
+31 verbose request sending authorization for write operation
+32 info attempt registry request try #1 at 18:26:25
+33 verbose request using bearer token for auth
+34 verbose request id 554a2d1689176c26
+35 http request PUT https://registry.npmjs.org/amonite-js
+36 http 403 https://registry.npmjs.org/amonite-js
+37 verbose headers { date: 'Mon, 13 Aug 2018 16:26:27 GMT',
+37 verbose headers   'content-type': 'application/json',
+37 verbose headers   'transfer-encoding': 'chunked',
+37 verbose headers   connection: 'keep-alive',
+37 verbose headers   'set-cookie': [ '__cfduid=d96e516af87c31c7bb0357bab776714ff1534177586; expires=Tue, 13-Aug-19 16:26:26 GMT; path=/; domain=.registry.npmjs.org; HttpOnly' ],
+37 verbose headers   'cf-ray': '449c8b18cfbc3c1d-CDG',
+37 verbose headers   'expect-ct': 'max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"',
+37 verbose headers   server: 'cloudflare',
+37 verbose headers   'content-encoding': 'gzip' }
+38 verbose request invalidating /home/vcourtin/.npm/registry.npmjs.org/amonite-js on PUT
+39 error publish Failed PUT 403
+40 verbose stack Error: you must verify your email before publishing a new package: https://www.npmjs.com/email-edit : amonite-js
+40 verbose stack     at makeError (/usr/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:264:12)
+40 verbose stack     at CachingRegistryClient.<anonymous> (/usr/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:252:14)
+40 verbose stack     at /usr/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:178:7
+40 verbose stack     at Gunzip.onEnd (zlib.js:227:5)
+40 verbose stack     at emitNone (events.js:91:20)
+40 verbose stack     at Gunzip.emit (events.js:185:7)
+40 verbose stack     at endReadableNT (_stream_readable.js:978:12)
+40 verbose stack     at _combinedTickCallback (internal/process/next_tick.js:80:11)
+40 verbose stack     at process._tickCallback (internal/process/next_tick.js:104:9)
+41 verbose statusCode 403
+42 verbose pkgid amonite-js
+43 verbose cwd /home/vcourtin/wks/src/amonite-js
+44 error Linux 4.16.11-100.fc26.x86_64
+45 error argv "/usr/bin/node" "/usr/bin/npm" "publish"
+46 error node v6.14.2
+47 error npm  v3.8.6
+48 error code E403
+49 error you must verify your email before publishing a new package: https://www.npmjs.com/email-edit : amonite-js
+50 error If you need help, you may report this error at:
+50 error     <https://github.com/npm/npm/issues>
+51 verbose exit [ 1, true ]

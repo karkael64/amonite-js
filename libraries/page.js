@@ -1,5 +1,6 @@
 const Content = require( './content' );
 const type = require( 'types' );
+const Error = require( './amonite-error' );
 
 /**
  * @class Page is used to create easy Component wrapper, often HTML items. For example, you can add components in your

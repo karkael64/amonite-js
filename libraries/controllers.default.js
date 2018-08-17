@@ -12,6 +12,7 @@ const path = require( 'path' );
 const fs = require( 'fs' );
 const http = require( 'http' );
 const type = require( 'types' );
+const Error = require( './amonite-error' );
 
 /**
  * @function getFilename returns ${req} filepath with no '..' and no '//', then normalize it
@@ -63,6 +64,7 @@ function isExecuteFile( req, fn ) {
 
 function isHiddenFile( req, fn ) {
     if( req instanceof http.IncomingMessage && type.is_function( fn ) ){
+        console.log( req.file, isExecuteFilename( req ), getFilename( req ) + ".sjs" );
         if( !isExecuteFilename( req ) ){
             fs.access( getFilename( req ) + ".sjs", ( err ) => {
                 fn( !err );
@@ -159,7 +161,7 @@ function controller_hiddenFile( req, res, next ) {
             next( null, readHiddenFile );
         else
             next( new Error( "No match hidden server file." ) );
-    })
+    });
 }
 
 

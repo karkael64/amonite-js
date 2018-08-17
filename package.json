@@ -9,7 +9,6 @@
     "http-code": "github:karkael64/http-code",
     "types": "github:karkael64/types"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
