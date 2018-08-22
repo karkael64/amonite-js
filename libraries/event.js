@@ -1,17 +1,19 @@
-const Error = require( './amonite-error' );
+const HttpCode = require( 'http-code' );
+const Error = HttpCode.prototype.__proto__.constructor;
+
 const type = require( 'types' );
 const EventTarget = require( './event-target' );
 
 class Event {
 
-    constructor( type_or_previous_event, options_or_target, currentTarget, originalTarget ) {
+    constructor( name_or_previous_event, options_or_target, currentTarget, originalTarget ) {
 
-        if( type.is_string( type_or_previous_event ) ) {
+        if( type.is_string( name_or_previous_event ) ) {
 
-            let type_ = type_or_previous_event,
+            let name = name_or_previous_event,
                 options = options_or_target;
 
-            this.type = type_;
+            this.type = name;
 
             if( originalTarget && originalTarget instanceof EventTarget ) {
                 Object.defineProperty( this, 'originalTarget', {'configurable':false,'value':originalTarget} );
@@ -27,12 +29,12 @@ class Event {
             Object.defineProperty( this, 'timeStamp', {'configurable':false,'value':Date.now()} );
 
         }
-        else if( type_or_previous_event instanceof Event && options_or_target instanceof EventTarget ){
+        else if( name_or_previous_event instanceof Event && options_or_target instanceof EventTarget ){
 
-            let previous = type_or_previous_event,
+            let previous = name_or_previous_event,
                 target = options_or_target;
 
-            this.type = type_or_previous_event.type;
+            this.type = name_or_previous_event.type;
 
             if( originalTarget && originalTarget instanceof EventTarget ) {
                 Object.defineProperty( this, 'originalTarget', {'configurable':false,'value':previous.originalTarget} );
@@ -43,7 +45,7 @@ class Event {
             }
 
             if( type.is_object( options_or_target ) )
-                this.options = Object.create( type_or_previous_event.options );
+                this.options = Object.create( name_or_previous_event.options );
 
             Object.defineProperty( this, 'timeStamp', {'configurable':false,'value':previous.timeStamp} );
         }

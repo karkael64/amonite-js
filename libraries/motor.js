@@ -1,14 +1,15 @@
 const http = require( 'http' );
 const type = require( 'types' );
-const HttpCode = require( 'http-code' );
-const Content = require( './content' );
 const EventTarget = require( './event-target' );
 const Page = require( './page' );
 const Component = require( './component' );
 const reviveHttp = require( './http' );
 const reviveHttps = require( './https' );
 const path = require( 'path' );
-const Error = require( './amonite-error' );
+
+const HttpCode = require( 'http-code' );
+const Error = HttpCode.prototype.__proto__.constructor;
+const Content = Error.prototype.__proto__.constructor;
 
 /**
  * @alias Buffer.byteLength
@@ -327,6 +328,7 @@ class Amonite extends EventTarget {
 				httpCode.setHeader( 'Content-length', body_length( body ) );
 				httpCode.setHeader( 'Content-type', Content.getFilenameMime( this.req.file ) );
 
+				console.log( code );
 				this.res.writeHead( code, title, httpCode.headers );
 				this.res.end( body );
 				return next( null, this.req, this.res );
@@ -354,7 +356,7 @@ class Amonite extends EventTarget {
 					self.sendHttpCode( new HttpCode( 500, "Unexpected error", err ), next );
 				}
 				else {
-					self.sendHttpCode( new HttpCode( 500, "Not an error format" ), next );
+					self.sendHttpCode( new HttpCode( 500, "Not an error format", err ), next );
 				}
 			}
 		};

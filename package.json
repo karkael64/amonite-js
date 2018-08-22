@@ -29,5 +29,7 @@
     "url": "https://github.com/karkael64/amonite-js/issues"
   },
   "homepage": "https://github.com/karkael64/amonite-js#readme",
-  "files": "libraries/*.js"
+  "files": [
+    "libraries/*.js"
+  ]
 }

@@ -12,7 +12,9 @@ const path = require( 'path' );
 const fs = require( 'fs' );
 const http = require( 'http' );
 const type = require( 'types' );
-const Error = require( './amonite-error' );
+
+const HttpCode = require( 'http-code' );
+const Error = HttpCode.prototype.__proto__.constructor;
 
 /**
  * @function getFilename returns ${req} filepath with no '..' and no '//', then normalize it
@@ -64,7 +66,6 @@ function isExecuteFile( req, fn ) {
 
 function isHiddenFile( req, fn ) {
     if( req instanceof http.IncomingMessage && type.is_function( fn ) ){
-        console.log( req.file, isExecuteFilename( req ), getFilename( req ) + ".sjs" );
         if( !isExecuteFilename( req ) ){
             fs.access( getFilename( req ) + ".sjs", ( err ) => {
                 fn( !err );
