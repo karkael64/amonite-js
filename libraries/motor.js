@@ -328,7 +328,6 @@ class Amonite extends EventTarget {
 				httpCode.setHeader( 'Content-length', body_length( body ) );
 				httpCode.setHeader( 'Content-type', Content.getFilenameMime( this.req.file ) );
 
-				console.log( code );
 				this.res.writeHead( code, title, httpCode.headers );
 				this.res.end( body );
 				return next( null, this.req, this.res );
