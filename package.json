@@ -1,6 +1,6 @@
 {
   "name": "amonite",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Run a motor to execute HTML files",
   "main": "libraries/motor.js",
   "dependencies": {
