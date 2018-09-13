@@ -1,8 +1,10 @@
-const HttpCode = require( 'http-code' );
-const Error = HttpCode.prototype.__proto__.constructor;
-const Content = Error.prototype.__proto__.constructor;
+const HttpCode = require('http-code');
+const Error = HttpCode.AmoniteError;
+const Content = Error.Content;
 
-const type = require( 'types' );
+function is_function(el) {
+    return (typeof el === 'function');
+}
 
 /**
  * @class Page is used to create easy Component wrapper, often HTML items. For example, you can add components in your
@@ -12,60 +14,60 @@ const type = require( 'types' );
 
 class Page extends Content {
 
-	/**
-	 * @warn this class can't be instanciated as if, a child class should have getPage as method.
-	 */
+    /**
+     * @warn this class can't be instanciated as if, a child class should have getPage as method.
+     */
 
-	constructor() {
-		super();
-		if( !type.is_function( this.getPage ) )
-			throw new Error( "This instance of Component has no getPage function!" );
-		this.components = [];
+    constructor() {
+        super();
+        if (!is_function(this.getPage))
+            throw new Error("This instance of Component has no getPage function!");
+        this.components = [];
         this.lastContent = null;
-	}
+    }
 
-	/**
-	 * @function addComponent register component constructor in this Page instance
-	 * @param obj {Object}
-	 * @returns {Page}
-	 */
+    /**
+     * @function addComponent register component constructor in this Page instance
+     * @param obj {Object}
+     * @returns {Page}
+     */
 
-	addComponent( obj ) {
-		this.components.push( obj );
-		return this;
-	}
+    addComponent(obj) {
+        this.components.push(obj);
+        return this;
+    }
 
-	/**
-	 * @function getContent is the main function called to send the body.
-	 * @param req Http.IncomingMessage
-	 * @param res Http.ServerResponse
-	 * @param next function( Error err, string body )
-	 */
+    /**
+     * @function getContent is the main function called to send the body.
+     * @param req Http.IncomingMessage
+     * @param res Http.ServerResponse
+     * @param next function( Error err, string body )
+     */
 
-	getContent( req, res, next ) {
-		let len = this.components.length,
-			i = 0,
-			self = this;
-		if( len ) {
-			for( let comp of this.components ){
-				comp.getContent( req, res, ()=>{
-					i++;
-					if( i >= len ) {
-						self.getPage( req, res, ( err, body ) => {
+    getContent(req, res, next) {
+        let len = this.components.length,
+            i = 0,
+            self = this;
+        if (len) {
+            for (let comp of this.components) {
+                comp.getContent(req, res, () => {
+                    i++;
+                    if (i >= len) {
+                        self.getPage(req, res, (err, body) => {
                             self.lastContent = err || body;
-                            next( err, body );
+                            next(err, body);
                         });
-					}
-				});
-			}
-		}
-		else {
-			self.getPage( req, res, ( err, body ) => {
-				self.lastContent = err || body;
-				next( err, body );
-			});
-		}
-	}
+                    }
+                });
+            }
+        }
+        else {
+            self.getPage(req, res, (err, body) => {
+                self.lastContent = err || body;
+                next(err, body);
+            });
+        }
+    }
 
     /**
      * @method getLastContent stock last content generated and return it.

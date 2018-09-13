@@ -1,8 +1,10 @@
-const HttpCode = require( 'http-code' );
-const Error = HttpCode.prototype.__proto__.constructor;
-const Content = Error.prototype.__proto__.constructor;
+const HttpCode = require('http-code');
+const Error = HttpCode.AmoniteError;
+const Content = Error.Content;
 
-const type = require( 'types' );
+function is_function(el) {
+    return (typeof el === 'function');
+}
 
 
 /**
@@ -12,27 +14,27 @@ const type = require( 'types' );
  * @param next function( Error err, String content )
  */
 
-function getIntoContent( req, res, next ) {
+function getIntoContent(req, res, next) {
 
     let name = this.constructor.name,
         self = this;
 
-    if( type.is_function( this.onCall ) && ( req.arguments.get( 'component' ) === name ) ) {
-        this.onCall( req, res, ()=>{
-            self.getComponent( req, res, ( err, body )=>{
-                let etag = Content.bodyEtag( body ),
+    if (is_function(this.onCall) && ( req.arguments.get('component') === name )) {
+        this.onCall(req, res, () => {
+            self.getComponent(req, res, (err, body) => {
+                let etag = Content.bodyEtag(body),
                     content = `<div component="${name}" etag="${etag}">${body}</div>`;
                 this.lastContent = err || content;
-                return next( err, content );
+                return next(err, content);
             });
         });
     }
     else {
-        this.getComponent( req, res, ( err, body )=>{
-            let etag = Content.bodyEtag( body ),
+        this.getComponent(req, res, (err, body) => {
+            let etag = Content.bodyEtag(body),
                 content = `<div component="${name}" etag="${etag}">${body}</div>`;
             this.lastContent = err || content;
-            return next( err, content );
+            return next(err, content);
         });
     }
 }
@@ -49,17 +51,17 @@ function getIntoContent( req, res, next ) {
 
 class Component extends Content {
 
-	/**
-	 * @warn this class can't be instanciated as if, a child class should have getComponent as method.
-	 */
+    /**
+     * @warn this class can't be instanciated as if, a child class should have getComponent as method.
+     */
 
-	constructor() {
-		super();
-		if( !type.is_function( this.getComponent ) )
-			throw new Error( "This instance of Component has no getComponent function!" );
+    constructor() {
+        super();
+        if (!is_function(this.getComponent))
+            throw new Error("This instance of Component has no getComponent function!");
         this.components = [];
-		this.lastContent = null;
-	}
+        this.lastContent = null;
+    }
 
     /**
      * @function addComponent register component constructor in this Page instance
@@ -67,8 +69,8 @@ class Component extends Content {
      * @returns {Component}
      */
 
-    addComponent( obj ) {
-        this.components.push( obj );
+    addComponent(obj) {
+        this.components.push(obj);
         return this;
     }
 
@@ -79,45 +81,45 @@ class Component extends Content {
      * @param next function( Error err, string body )
      */
 
-    getContent( req, res, next ) {
+    getContent(req, res, next) {
 
-        if( !type.is_function( next ) ) {
-            if( this.lastContent ) {
-                throw new Error( "Third parameter should be a String. " +
-                    "Otherwise, content is already set, please use getLastContent() instead of getContent().", 2 );
+        if (!is_function(next)) {
+            if (this.lastContent) {
+                throw new Error("Third parameter should be a String. " +
+                    "Otherwise, content is already set, please use getLastContent() instead of getContent().", 2);
             }
             else {
-                throw new Error( "Third parameter should be a String.", 1 );
+                throw new Error("Third parameter should be a String.", 1);
             }
         }
 
         let len = this.components.length,
             i = 0,
             self = this;
-        if( len ) {
-            for( let comp in this.components ){
-                comp.getContent( req, res, ()=>{
+        if (len) {
+            for (let comp in this.components) {
+                comp.getContent(req, res, () => {
                     i++;
-                    if( i >= len ) {
-                        getIntoContent.call( self, req, res, next );
+                    if (i >= len) {
+                        getIntoContent.call(self, req, res, next);
                     }
                 });
             }
         }
         else {
-            getIntoContent.call( self, req, res, next );
+            getIntoContent.call(self, req, res, next);
         }
     }
 
 
     /**
-	 * @method getLastContent stock last content generated and return it.
-	 * @return string
+     * @method getLastContent stock last content generated and return it.
+     * @return string
      */
 
-	getLastContent() {
+    getLastContent() {
         return this.lastContent;
-	}
+    }
 }
 
 module.exports = Component;

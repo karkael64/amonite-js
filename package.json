@@ -1,13 +1,13 @@
 {
   "name": "amonite",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Run a motor to execute HTML files",
   "main": "libraries/motor.js",
   "dependencies": {
     "bson": "github:karkael64/bson",
+    "event-target": "github:karkael64/event-target",
     "http-arguments": "github:karkael64/http-arguments",
-    "http-code": "github:karkael64/http-code",
-    "types": "github:karkael64/types"
+    "http-code": "github:karkael64/http-code"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
