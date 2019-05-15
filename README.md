@@ -1,2 +1,127 @@
-# amonite-js
-New motor with node.js
+# Amonite 
+ Amonite is a web client-side ([JS](https://github.com/karkael64/amonite-front)) and server-side (PHP and [NodeJS](https://github.com/karkael64/amonite-php)) engine. It is an engine that complies with HTTP standards, lightweight, easy to use. It's an engine that lets you decide how the program should go forward.
+
+## Amonite-JS
+ Amonite is a good NodeJS engine :
+ - with torque Request / Controller, 
+ - with Document / Component couple and 
+ - with Throwable / Answerable response easy to use.
+
+### Why would you use Amonite-JS
+ 1. Easy paradigm, 
+ 2. Soft framework, 
+ 3. Easy installation,
+ 4. 3 Steps document sending and
+ 5. Follow HTTP Standards.
+
+### Why would you NOT use Amonite-JS
+ 1. You need heavy control system, 
+ 3. You don't trust your colleagues and
+ 2. Expensive tool are most qualitative.
+
+## Start with Amonite-JS
+ All Amonite engine is archived as a PHAR file. Put it on root, or any where :
+ `/amonite.phar`
+ 
+ May be you would like use it with default config. Then just call it like : 
+ ```
+const hostname = '127.0.0.1';
+const port = 8000;
+
+const Amonite = require( './libraries/motor' );
+
+let a = new Amonite;
+a.reviveHttp( hostname, port, true );
+ ```
+ 
+ [What does default config do ?](how_it_works.md#amonite-js-particularly)
+
+## Enhance Amonite-JS
+ Amonite default config uses HttpCode, Content, Page and Component.
+ 
+### Answerable file : Page / Component model
+ You can enhance the engine with Page / Component classes or you can create any class that extends `Content` class. In example :
+ 
+__File : /templates/pages/IndexPage.js__
+ ```
+const Page = require('../../libraries/page')
+const NavComponent = require('../components/NavComponent.js')
+
+class IndexPage extends Page {
+  constructor () {
+    this.addComponent(this.$nav = new NavComponent))
+  }
+  
+  getPage (req, res, then) {
+    then (null, `<!doctype html><html>
+    <head>
+    </head>
+    <body>
+        ${this.$nav.getLastContent()}
+    </body></html>`)
+  }
+}
+
+module.exports = IndexPage
+
+ ```
+ 
+__File : /templates/components/NavComponent.js__
+ ```
+ const Component = require('../../libraries/component')
+ 
+ class NavComponent extends Component {
+ 
+     getComponent (req, res, then) {
+         then(null, `<nav>
+            <ul>
+                <li>
+                    <a href="#a">A</a>
+                </li>
+                <li>
+                    <a href="#b">B</a>
+                </li>
+                <li>
+                    <a href="#c">C</a>
+                </li>
+            </ul>
+        </nav>`)
+     }
+ }
+ 
+ module.exports = NavComponent
+ ```
+
+__File : /theme/main/index.html.sjs__
+ ```
+module.exports = require('../../templates/pages/IndexPage')
+ ```
+ 
+### Database management : BSON format
+ You can enhance the engine with ModelBSON data model or you can create any class that implements `Model` interface. In example :
+ ```
+ 
+let selected = []
+function each_select (err, data, then) { selected.push(data); then(); }
+function each_update (err, data, push) { push(data); }
+function next (err) {}
+
+let row = new BSON(123)
+row.load((err) => {
+  // to do then...
+  row.last_update = new Date().toJSON()
+  row.save((err) => {
+    // to do then...
+  })
+})
+
+const BSON = require("bson")
+BSON.select(each_select, next)
+BSON.update(each_update, next)
+BSON.insert(row, next)
+ ```
+
+## Documentation & References
+
+[Documentation & References](#)
+
