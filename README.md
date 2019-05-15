@@ -33,8 +33,40 @@ const Amonite = require( './libraries/motor' );
 let a = new Amonite;
 a.reviveHttp( hostname, port, true );
  ```
- 
+
  [What does default config do ?](how_it_works.md#amonite-js-particularly)
+ 
+### Use with secured HTTPS
+  ```
+const hostname = '127.0.0.1';
+const port = 8000;
+
+const fs = require( 'fs' );
+const https_options = {
+    key: fs.readFileSync( './https/key.pem' ),
+    cert: fs.readFileSync( './https/cert.pem' )
+};
+
+const Amonite = require( './libraries/motor' );
+
+let a = new Amonite;
+a.reviveHttps( hostname, port, https_options, true );
+ ```
+ 
+### Define the files folder
+  ```
+const hostname = '127.0.0.1';
+const port = 8000;
+
+const Amonite = require( './libraries/motor' );
+
+const path = require('path')
+Amonite.logFile = path.resolve( __dirname + '/log.bson' );
+Amonite.publicPath = path.resolve( __dirname + '/theme' ) + '/';
+
+let a = new Amonite;
+a.reviveHttp( hostname, port, true );
+ ```
 
 ## Enhance Amonite-JS
  Amonite default config uses HttpCode, Content, Page and Component.
