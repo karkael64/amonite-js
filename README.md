@@ -15,11 +15,11 @@
  4. Follow HTTP Standards.
 
  Pacify the Workspace!
- 5. Two-way document sending (not thousands): a document or an error, 
- 6. Easy manage your endpoints with files in a directory (here called THEME), where the path match the url, 
- 7. Easy simple file sending (with no file processing), 
- 8. Easy data processing entry (by calling a file ending with ".sjs" extension), 
- 9. You can easy `throw new HttpCode(403)` (for example) anywhere in your code.
+ 1. Two-way document sending (not thousands): a document or an error, 
+ 2. Easy manage your endpoints with files in a directory (here called THEME), where the path match the url, 
+ 3. Easy simple file sending (with no file processing), 
+ 4. Easy data processing entry (by calling a file ending with ".sjs" extension), 
+ 5. You can easy `throw new HttpCode(403)` (for example) anywhere in your code.
 
 ### Why would you NOT use Amonite-JS
  1. You need heavy control system, 
@@ -134,7 +134,7 @@ module.exports = require('../../templates/pages/IndexPage')
  ```
 
 ### Database management : BSON format
- You can enhance the engine with BSON data model or you can create any class that implements `Model` interface. In example :
+ You can create any class that inherit `BSON`. In example :
  ```
 const BSON = require("bson")
 
