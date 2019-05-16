@@ -1,5 +1,5 @@
 # Amonite 
- Amonite is a web client-side ([JS](https://github.com/karkael64/amonite-front)) and server-side (PHP and [NodeJS](https://github.com/karkael64/amonite-php)) engine. It is an engine that complies with HTTP standards, lightweight, easy to use. It's an engine that lets you decide how the program should go forward.
+ Amonite is composed with a web client-side ([JS](https://github.com/karkael64/amonite-front)) and server-side ([PHP](https://github.com/karkael64/amonite-php) and NodeJS) engine. It is an engine that complies with HTTP standards, lightweight, easy to use. It's an engine that lets you decide how the program should go forward.
 
 ## Amonite-JS
  Amonite is a good NodeJS engine :
@@ -8,21 +8,25 @@
  - with Throwable / Answerable response easy to use.
 
 ### Why would you use Amonite-JS
+ Power Up!
  1. Easy paradigm, 
  2. Soft framework, 
- 3. Easy installation,
- 4. 3 Steps document sending and
- 5. Follow HTTP Standards.
+ 3. Easy installation, 
+ 4. Follow HTTP Standards.
+
+ Pacify the Workspace!
+ 5. Two-way document sending (not thousands): a document or an error, 
+ 6. Easy manage your endpoints with files in a directory (here called THEME), where the path match the url, 
+ 7. Easy simple file sending (with no file processing), 
+ 8. Easy data processing entry (by calling a file ending with ".sjs" extension), 
+ 9. You can easy `throw new HttpCode(403)` (for example) anywhere in your code.
 
 ### Why would you NOT use Amonite-JS
  1. You need heavy control system, 
- 3. You don't trust your colleagues and
- 2. Expensive tool are most qualitative.
+ 3. You don't trust your colleagues or craftmanship and
+ 2. Expensive tools are most qualitative.
 
 ## Start with Amonite-JS
- All Amonite engine is archived as a PHAR file. Put it on root, or any where :
- `/amonite.phar`
- 
  May be you would like use it with default config. Then just call it like : 
  ```
 const hostname = '127.0.0.1';
@@ -62,7 +66,7 @@ const Amonite = require( './libraries/motor' );
 
 const path = require('path')
 Amonite.logFile = path.resolve( __dirname + '/log.bson' );
-Amonite.publicPath = path.resolve( __dirname + '/theme' ) + '/';
+Amonite.publicPath = path.resolve( __dirname + '/THEME' ) + '/';
 
 let a = new Amonite;
 a.reviveHttp( hostname, port, true );
@@ -124,21 +128,24 @@ __File : /templates/components/NavComponent.js__
  module.exports = NavComponent
  ```
 
-__File : /theme/main/index.html.sjs__
+__File : /THEME/main/index.html.sjs__
  ```
 module.exports = require('../../templates/pages/IndexPage')
  ```
- 
+
 ### Database management : BSON format
- You can enhance the engine with ModelBSON data model or you can create any class that implements `Model` interface. In example :
+ You can enhance the engine with BSON data model or you can create any class that implements `Model` interface. In example :
  ```
+const BSON = require("bson")
+
+class UserBson extends BSON {}
  
 let selected = []
 function each_select (err, data, then) { selected.push(data); then(); }
 function each_update (err, data, push) { push(data); }
 function next (err) {}
 
-let row = new BSON(123)
+let row = new UserBson(123)
 row.load((err) => {
   // to do then...
   row.last_update = new Date().toJSON()
@@ -147,13 +154,18 @@ row.load((err) => {
   })
 })
 
+UserBson.select(each_select, next)
+UserBson.update(each_update, next)
+UserBson.insert(row, next)
+ ```
+ 
+ You can edit BSON file location with: 
+ ```
+const path = require("path")
 const BSON = require("bson")
-BSON.select(each_select, next)
-BSON.update(each_update, next)
-BSON.insert(row, next)
+BSON.FOLDER = path.resolve("your/path/to/data") + "/"
  ```
 
 ## Documentation & References
 
 [Documentation & References](#)
-
